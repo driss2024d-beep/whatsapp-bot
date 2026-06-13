@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Bot WhatsApp</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; }
+  .header { background: #25D366; color: white; padding: 20px; text-align: center; }
+  .header h1 { font-size: 24px; }
+  .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+  .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  .card h2 { color: #25D366; margin-bottom: 15px; font-size: 18px; }
+  input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: Arial; }
+  textarea { height: 80px; resize: vertical; }
+  .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin: 5px; }
+  .btn-green { background: #25D366; color: white; }
+  .btn-red { background: #ff4444; color: white; }
+  .btn-blue { background: #007bff; color: white; }
+  .btn-orange { background: #ff9800; color: white; }
+  .entreprise-card { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+  .section-card { background: white; border: 1px solid #25D366; border-radius: 8px; padding: 15px; margin: 10px 0; }
+  .question-card { background: #f0fff4; border: 1px solid #b2dfdb; border-radius: 6px; padding: 10px; margin: 8px 0; }
+  .badge { background: #25D366; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+  .badge-red { background: #ff4444; }
+  .loading { text-align: center; padding: 20px; color: #888; }
+  h3 { margin: 10px 0; color: #333; }
+  h4 { margin: 8px 0; color: #555; }
+  hr { border: none; border-top: 1px solid #eee; margin: 15px 0; }
+  .form-group { margin-bottom: 15px; }
+  .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+  .description-preview { background: #e3f2fd; padding: 8px; border-radius: 6px; margin: 5px 0; font-size: 12px; color: #555; }
+  small { color: #666; display: block; margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🤖 Dashboard Bot WhatsApp</h1>
+  <p>إدارة الأسئلة الشائعة لكل شركة</p>
+</div>
+
+<div class="container">
+
+  <!-- Ajouter Entreprise -->
+  <div class="card">
+    <h2>➕ إضافة شركة جديدة</h2>
+    <div class="form-group">
+      <label>اسم الشركة</label>
+      <input type="text" id="nom" placeholder="ex: Boutique Moda">
+    </div>
+    <div class="form-group">
+      <label>رقم WhatsApp</label>
+      <input type="text" id="numero" placeholder="ex: 212612838772">
+    </div>
+    <div class="form-group">
+      <label>رسالة الترحيب</label>
+      <textarea id="salutation" placeholder="مرحبا بك ! 👋"></textarea>
+    </div>
+    <button class="btn btn-green" onclick="ajouterEntreprise()">✅ إضافة الشركة</button>
+  </div>
+
+  <!-- Liste Entreprises -->
+  <div class="card">
+    <h2>🏢 قائمة الشركات</h2>
+    <div id="liste-entreprises">
+      <div class="loading">⏳ جاري التحميل...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+
+// ✅ Charger toutes les entreprises
+async function chargerEntreprises() {
+  try {
+    const res = await fetch(`${API}/api/entreprises`);
+    const data = await res.json();
+    afficherEntreprises(data);
+  } catch(e) {
+    document.getElementById('liste-entreprises').innerHTML = 
+      '<p style="color:red">❌ Erreur de connexion au serveur</p>';
+  }
+}
+
+// ✅ Afficher les entreprises
+function afficherEntreprises(entreprises) {
+  const div = document.getElementById('liste-entreprises');
+  
+  if (entreprises.length === 0) {
+    div.innerHTML = '<p class="loading">لا توجد شركات بعد</p>';
+    return;
+  }
+
+  div.innerHTML = entreprises.map(e => `
+    <div class="entreprise-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap">
+        <div>
+          <h3>🏢 ${e.nom}</h3>
+          <p>📱 ${e.numeroWhatsApp}</p>
+          <p>👋 ${e.salutation}</p>
+        </div>
+        <div>
+          <span class="badge ${e.actif ? '' : 'badge-red'}">${e.actif ? 'نشط ✅' : 'متوقف ❌'}</span>
+          <button class="btn btn-orange" onclick="toggleActif('${e._id}', ${e.actif})">
+            ${e.actif ? '⏸ إيقاف' : '▶️ تشغيل'}
+          </button>
+          <button class="btn btn-red" onclick="supprimerEntreprise('${e._id}')">🗑️ حذف</button>
+        </div>
+      </div>
+      
+      <hr>
+      
+      <!-- Sections -->
+      <h4>📋 الأقسام والأسئلة :</h4>
+      ${e.sections.map((s, si) => `
+        <div class="section-card">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4>📌 ${s.titre}</h4>
+            <button class="btn btn-red" style="padding:5px 10px" 
+              onclick="supprimerSection('${e._id}', ${si})">🗑️</button>
+          </div>
+          
+          ${s.questions.map((q, qi) => `
+            <div class="question-card">
+              <p><strong>❓ ${q.question}</strong></p>
+              ${q.description ? `<div class="description-preview">📝 ${q.description}</div>` : ''}
+              <p>💬 ${q.reponse}</p>
+              ${q.audioUrl ? `<p>🎵 <strong>Audio :</strong> <a href="${q.audioUrl}" target="_blank">استمع</a></p>` : ''}
+              <button class="btn btn-red" style="padding:3px 8px; font-size:12px"
+                onclick="supprimerQuestion('${e._id}', ${si}, ${qi})">🗑️ حذف</button>
+            </div>
+          `).join('')}
+          
+          <!-- Ajouter question -->
+          <div style="margin-top:10px; background:#f8f9fa; padding:10px; border-radius:6px">
+            <p><strong>➕ إضافة سؤال في هذا القسم :</strong></p>
+            <div class="form-group">
+              <label>السؤال</label>
+              <input type="text" id="q_${e._id}_${si}" placeholder="السؤال">
+            </div>
+            <div class="form-group">
+              <label>الوصف (يظهر تحت السؤال في القائمة)</label>
+              <textarea id="d_${e._id}_${si}" placeholder="وصف قصير للسؤال"></textarea>
+            </div>
+            <div class="form-group">
+              <label>الجواب</label>
+              <textarea id="r_${e._id}_${si}" placeholder="الجواب"></textarea>
+            </div>
+            <div class="form-group">
+              <label>رابط الملف الصوتي (اختياري)</label>
+              <input type="text" id="a_${e._id}_${si}" placeholder="https://example.com/audio.mp3">
+              <small>← ملف mp3 أو ogg (استخدم Cloudinary أو Google Drive)</small>
+            </div>
+            <button class="btn btn-blue" 
+              onclick="ajouterQuestion('${e._id}', ${si})">➕ إضافة السؤال</button>
+          </div>
+        </div>
+      `).join('')}
+      
+      <!-- Ajouter قسم جديد -->
+      <div style="margin-top:15px; background:#e8f5e9; padding:15px; border-radius:8px">
+        <p><strong>➕ إضافة قسم جديد :</strong></p>
+        <input type="text" id="section_${e._id}" placeholder="اسم القسم">
+        <button class="btn btn-green" onclick="ajouterSection('${e._id}')">➕ إضافة القسم</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ✅ Ajouter entreprise
+async function ajouterEntreprise() {
+  const nom = document.getElementById('nom').value;
+  const numero = document.getElementById('numero').value;
+  const salutation = document.getElementById('salutation').value;
+  
+  if (!nom || !numero || !salutation) {
+    alert('❌ يرجى ملء جميع الحقول !');
+    return;
+  }
+  
+  await fetch(`${API}/api/entreprises`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nom, numeroWhatsApp: numero, salutation,
+      sections: [], actif: true
+    })
+  });
+  
+  document.getElementById('nom').value = '';
+  document.getElementById('numero').value = '';
+  document.getElementById('salutation').value = '';
+  
+  alert('✅ تمت إضافة الشركة !');
+  chargerEntreprises();
+}
+
+// ✅ Ajouter section
+async function ajouterSection(id) {
+  const titre = document.getElementById(`section_${id}`).value;
+  if (!titre) { alert('❌ أدخل اسم القسم !'); return; }
+  
+  const res = await fetch(`${API}/api/entreprises`);
+  const data = await res.json();
+  const entreprise = data.find(e => e._id === id);
+  
+  entreprise.sections.push({ titre, questions: [] });
+  
+  await fetch(`${API}/api/entreprises/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entreprise)
+  });
+  
+  alert('✅ تمت إضافة القسم !');
+  chargerEntreprises();
+}
+
+// ✅ Ajouter question مع description و audio
+async function ajouterQuestion(id, sectionIndex) {
+  const question = document.getElementById(`q_${id}_${sectionIndex}`).value;
+  const description = document.getElementById(`d_${id}_${sectionIndex}`).value;
+  const reponse = document.getElementById(`r_${id}_${sectionIndex}`).value;
+  const audioUrl = document.getElementById(`a_${id}_${sectionIndex}`).value;
+  
+  if (!question || !reponse) { 
+    alert('❌ أدخل السؤال والجواب على الأقل !'); 
+    return; 
+  }
+  
+  const res = await fetch(`${API}/api/entreprises`);
+  const data = await res.json();
+  const entreprise = data.find(e => e._id === id);
+  
+  entreprise.sections[sectionIndex].questions.push({ 
+    question, 
+    description: description || '', 
+    reponse,
+    audioUrl: audioUrl || ''
+  });
+  
+  await fetch(`${API}/api/entreprises/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entreprise)
+  });
+  
+  alert('✅ تمت إضافة السؤال !');
+  chargerEntreprises();
+}
+
+// ✅ Supprimer question
+async function supprimerQuestion(id, si, qi) {
+  if (!confirm('هل تريد حذف هذا السؤال ؟')) return;
+  
+  const res = await fetch(`${API}/api/entreprises`);
+  const data = await res.json();
+  const entreprise = data.find(e => e._id === id);
+  
+  entreprise.sections[si].questions.splice(qi, 1);
+  
+  await fetch(`${API}/api/entreprises/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entreprise)
+  });
+  
+  chargerEntreprises();
+}
+
+// ✅ Supprimer section
+async function supprimerSection(id, si) {
+  if (!confirm('هل تريد حذف هذا القسم ؟')) return;
+  
+  const res = await fetch(`${API}/api/entreprises`);
+  const data = await res.json();
+  const entreprise = data.find(e => e._id === id);
+  
+  entreprise.sections.splice(si, 1);
+  
+  await fetch(`${API}/api/entreprises/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entreprise)
+  });
+  
+  chargerEntreprises();
+}
+
+// ✅ Supprimer entreprise
+async function supprimerEntreprise(id) {
+  if (!confirm('هل تريد حذف هذه الشركة ؟')) return;
+  
+  await fetch(`${API}/api/entreprises/${id}`, { method: 'DELETE' });
+  chargerEntreprises();
+}
+
+// ✅ Activer/Désactiver
+async function toggleActif(id, actif) {
+  await fetch(`${API}/api/entreprises/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ actif: !actif })
+  });
+  chargerEntreprises();
+}
+
+// Charger au démarrage
+chargerEntreprises();
+</script>
+</body>
+</html>
