@@ -26,6 +26,7 @@ const sectionSchema = new mongoose.Schema({
 const entrepriseSchema = new mongoose.Schema({
   nom: String,
   numeroWhatsApp: String,
+  motdepasse: String,        // ← NOUVEAU : mot de passe client dashboard
   salutation: String,
   sections: [sectionSchema],
   actif: { type: Boolean, default: true }
@@ -50,6 +51,7 @@ const connectMongoDB = async () => {
       await Entreprise.create({
         nom: "Boutique Test",
         numeroWhatsApp: "212612838772",
+        motdepasse: "boutique123",   // ← mot de passe par défaut pour le test
         salutation: "مرحبا بك ! 👋 كيف يمكنني مساعدتك ؟",
         actif: true,
         sections: [
@@ -137,8 +139,6 @@ app.post('/webhook', async (req, res) => {
     if (msg.type === 'text') {
       texteRecu = msg.text?.body?.trim();
 
-      // ✅ IGNORER TOUS LES MESSAGES TEXTE EN MODE "attente_choix"
-      // Car WhatsApp envoie automatiquement le texte de la question quand on clique
       if (session.etat === 'attente_choix') {
         console.log('⏭️ Message ignoré (clic sur la liste):', texteRecu);
         return;
@@ -159,6 +159,7 @@ app.post('/webhook', async (req, res) => {
 
     console.log(`📩 De ${from}: ${texteRecu}`);
 
+    // ✅ Chercher l'entreprise par numéro WhatsApp du destinataire
     let entreprise = await Entreprise.findOne({ actif: true });
     if (!entreprise) return;
 
@@ -179,11 +180,9 @@ app.post('/webhook', async (req, res) => {
       if (choix && choix > 0 && choix <= session.questions.length) {
         const q = session.questions[choix - 1];
 
-        // ✅ Envoyer réponse audio SI audioUrl existe
         if (q.audioUrl && q.audioUrl.trim() !== '') {
           await envoyerAudio(from, q.audioUrl, q.question, q.reponse);
         } else {
-          // Sinon envoyer texte avec bouton retour
           await envoyerReponse(from, q);
         }
 
@@ -281,22 +280,16 @@ async function envoyerReponse(to, q) {
 // ✅ Envoyer réponse AUDIO
 async function envoyerAudio(to, audioUrl, question, reponse) {
   try {
-    // 1. Envoyer le titre de la question
     await envoyerMessage(to, `*${question}*`);
-
-    // 2. Petit délai
     await new Promise(r => setTimeout(r, 500));
 
-    // 3. Envoyer le message audio
     await axios.post(
       `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
       {
         messaging_product: 'whatsapp',
         to: to,
         type: 'audio',
-        audio: {
-          link: audioUrl
-        }
+        audio: { link: audioUrl }
       },
       {
         headers: {
@@ -306,10 +299,8 @@ async function envoyerAudio(to, audioUrl, question, reponse) {
       }
     );
 
-    // 4. Petit délai
     await new Promise(r => setTimeout(r, 500));
 
-    // 5. Envoyer aussi la réponse texte + bouton retour
     await axios.post(
       `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
       {
