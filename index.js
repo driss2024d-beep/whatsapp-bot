@@ -137,16 +137,11 @@ app.post('/webhook', async (req, res) => {
     if (msg.type === 'text') {
       texteRecu = msg.text?.body?.trim();
 
-      // ✅ Ignorer messages automatiques WhatsApp
+      // ✅ IGNORER TOUS LES MESSAGES TEXTE EN MODE "attente_choix"
+      // Car WhatsApp envoie automatiquement le texte de la question quand on clique
       if (session.etat === 'attente_choix') {
-        const estTitreQuestion = session.questions?.some(
-          q => q.question.substring(0, 24) === texteRecu ||
-               q.question === texteRecu
-        );
-        if (estTitreQuestion) {
-          console.log('⏭️ Message automatique ignoré:', texteRecu);
-          return;
-        }
+        console.log('⏭️ Message ignoré (clic sur la liste):', texteRecu);
+        return;
       }
 
     } else if (msg.type === 'interactive') {
