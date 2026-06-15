@@ -5,240 +5,142 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Bot WhatsApp</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
+  * { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --green: #25D366;
-    --green-dark: #1ebe5a;
-    --green-light: #e8f5e9;
-    --red: #ef5350;
-    --blue: #1976D2;
-    --orange: #FB8C00;
-    --gray-bg: #f0f2f5;
-    --white: #ffffff;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --radius: 12px;
-    --radius-sm: 8px;
+    --green:#25D366; --green-dark:#1ebe5a; --green-light:#e8f5e9;
+    --red:#ef5350; --blue:#1976D2; --orange:#FB8C00; --purple:#7B1FA2;
+    --gray-bg:#f0f2f5;
+    --shadow:0 2px 12px rgba(0,0,0,0.08);
+    --radius:12px; --radius-sm:8px;
   }
+  body { font-family:'Segoe UI',Arial,sans-serif; background:var(--gray-bg); min-height:100vh; }
 
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-bg); min-height: 100vh; }
+  #login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460); }
+  .login-box { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; }
+  .login-logo { font-size:48px; margin-bottom:10px; }
+  .login-title { font-size:22px; font-weight:700; color:#1a1a2e; margin-bottom:5px; }
+  .login-subtitle { color:#888; font-size:13px; margin-bottom:30px; }
+  .login-input { width:100%; padding:13px 16px; border:2px solid #e0e0e0; border-radius:var(--radius-sm); font-size:15px; margin-bottom:15px; text-align:right; font-family:inherit; }
+  .login-input:focus { outline:none; border-color:var(--green); }
+  .login-btn { width:100%; padding:13px; background:var(--green); color:white; border:none; border-radius:var(--radius-sm); font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; }
+  .login-btn:hover { background:var(--green-dark); }
+  .login-error { background:#ffebee; color:var(--red); padding:10px; border-radius:var(--radius-sm); margin-top:12px; font-size:13px; display:none; }
 
-  #login-page {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  }
-  .login-box {
-    background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 400px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
-  }
-  .login-logo { font-size: 48px; margin-bottom: 10px; }
-  .login-title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 5px; }
-  .login-subtitle { color: #888; font-size: 13px; margin-bottom: 30px; }
-  .login-input {
-    width: 100%; padding: 13px 16px; border: 2px solid #e0e0e0; border-radius: var(--radius-sm);
-    font-size: 15px; margin-bottom: 15px; text-align: right; transition: border 0.2s; font-family: inherit;
-  }
-  .login-input:focus { outline: none; border-color: var(--green); }
-  .login-btn {
-    width: 100%; padding: 13px; background: var(--green); color: white; border: none;
-    border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; cursor: pointer;
-    transition: background 0.2s, transform 0.1s; font-family: inherit;
-  }
-  .login-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
-  .login-btn:active { transform: translateY(0); }
-  .login-error {
-    background: #ffebee; color: var(--red); padding: 10px; border-radius: var(--radius-sm);
-    margin-top: 12px; font-size: 13px; display: none;
-  }
+  #app-page { display:none; }
+  .header { background:linear-gradient(135deg,var(--green),#1ebe5a); color:white; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(37,211,102,0.3); }
+  .header-title { font-size:18px; font-weight:700; }
+  .header-subtitle { font-size:12px; opacity:0.85; }
+  .user-badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.2); padding:8px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
+  .user-badge:hover { background:rgba(255,255,255,0.3); }
+  .role-chip { background:rgba(255,255,255,0.9); color:var(--green-dark); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+  .role-chip.admin { color:#d32f2f; }
+  .container { max-width:960px; margin:0 auto; padding:24px 16px; }
 
-  #app-page { display: none; }
+  .card { background:white; border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:var(--shadow); }
+  .card-title { font-size:16px; font-weight:700; color:#1a1a1a; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+  .card-title-dot { width:4px; height:18px; background:var(--green); border-radius:2px; }
 
-  .header {
-    background: linear-gradient(135deg, var(--green) 0%, #1ebe5a 100%); color: white;
-    padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
-    height: 64px; box-shadow: 0 2px 10px rgba(37,211,102,0.3); position: sticky; top: 0; z-index: 100;
+  .form-group { margin-bottom:12px; }
+  .form-group label { display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:5px; }
+  input[type=text], input[type=password], input[type=number], textarea {
+    width:100%; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--radius-sm);
+    font-size:14px; font-family:inherit; background:#fafafa; transition:border 0.2s;
   }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .header-title { font-size: 18px; font-weight: 700; }
-  .header-subtitle { font-size: 12px; opacity: 0.85; }
-  .user-badge {
-    display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2);
-    padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: background 0.2s;
-  }
-  .user-badge:hover { background: rgba(255,255,255,0.3); }
-  .role-chip {
-    background: rgba(255,255,255,0.9); color: var(--green-dark); font-size: 10px;
-    font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase;
-  }
-  .role-chip.admin { color: #d32f2f; }
+  input:focus, textarea:focus { outline:none; border-color:var(--purple); background:white; }
+  textarea { height:70px; resize:vertical; }
 
-  .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  .btn { padding:9px 18px; border:none; border-radius:var(--radius-sm); cursor:pointer; font-size:13px; font-weight:600; font-family:inherit; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover { transform:translateY(-1px); opacity:0.9; }
+  .btn:active { transform:translateY(0); }
+  .btn-green  { background:var(--green);  color:white; }
+  .btn-red    { background:var(--red);    color:white; }
+  .btn-blue   { background:var(--blue);   color:white; }
+  .btn-orange { background:var(--orange); color:white; }
+  .btn-purple { background:var(--purple); color:white; }
+  .btn-sm { padding:5px 12px; font-size:12px; }
 
-  .card {
-    background: var(--white); border-radius: var(--radius); padding: 24px;
-    margin-bottom: 20px; box-shadow: var(--shadow);
-  }
-  .card-title {
-    font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 18px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .card-title-dot { width: 4px; height: 18px; background: var(--green); border-radius: 2px; }
+  .entreprise-card { border:1.5px solid #e8e8e8; border-radius:var(--radius); margin-bottom:16px; overflow:hidden; }
+  .entreprise-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:linear-gradient(to left,#f8fffe,#f0faf5); border-bottom:1px solid #e8e8e8; flex-wrap:wrap; gap:10px; }
+  .entreprise-info h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
+  .entreprise-info p { font-size:13px; color:#666; margin-top:2px; }
+  .entreprise-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .status-active   { background:#e8f5e9; color:#2e7d32; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+  .status-inactive { background:#ffebee; color:#c62828; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+  .entreprise-body { padding:20px; }
 
-  .form-group { margin-bottom: 14px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+  .etape-card { border:2px solid var(--purple); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
+  .etape-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:linear-gradient(to left,#f3e5f5,#ede7f6); border-bottom:1px solid #ce93d8; gap:12px; }
+  .etape-num { width:34px; height:34px; background:var(--purple); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
+  .etape-info { flex:1; }
+  .etape-titre { font-size:15px; font-weight:700; color:#4a148c; }
+  .etape-question { font-size:12px; color:#777; margin-top:2px; }
+  .etape-body { padding:14px 16px; background:white; }
 
-  input[type=text], textarea, select {
-    width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: var(--radius-sm);
-    font-size: 14px; font-family: inherit; transition: border 0.2s; background: #fafafa;
-  }
-  input[type=text]:focus, textarea:focus, select:focus { outline: none; border-color: var(--green); background: white; }
-  textarea { height: 80px; resize: vertical; }
+  .option-card { display:flex; align-items:center; justify-content:space-between; background:#f3e5f5; border:1px solid #ce93d8; border-right:4px solid var(--purple); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:8px; gap:10px; }
+  .option-texte { font-weight:600; font-size:14px; }
+  .option-desc  { font-size:12px; color:#888; margin-top:2px; }
 
-  .btn {
-    padding: 9px 18px; border: none; border-radius: var(--radius-sm); cursor: pointer;
-    font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.15s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .btn:hover { transform: translateY(-1px); opacity: 0.9; }
-  .btn:active { transform: translateY(0); }
-  .btn-green { background: var(--green); color: white; }
-  .btn-red { background: var(--red); color: white; }
-  .btn-blue { background: var(--blue); color: white; }
-  .btn-orange { background: var(--orange); color: white; }
-  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .add-zone { background:#fafafa; border:1.5px dashed #ccc; border-radius:var(--radius-sm); padding:14px; margin-top:10px; }
+  .add-zone-title { font-size:13px; font-weight:700; margin-bottom:10px; }
+  .add-etape-zone { background:#f3e5f5; border:2px dashed #ce93d8; border-radius:var(--radius-sm); padding:16px; margin-top:16px; }
 
-  .entreprise-card {
-    border: 1.5px solid #e8e8e8; border-radius: var(--radius); margin-bottom: 16px;
-    overflow: hidden; transition: box-shadow 0.2s;
-  }
-  .entreprise-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-  .entreprise-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; background: linear-gradient(to left, #f8fffe, #f0faf5);
-    border-bottom: 1px solid #e8e8e8; flex-wrap: wrap; gap: 10px;
-  }
-  .entreprise-info h3 { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
-  .entreprise-info p { font-size: 13px; color: #666; }
-  .entreprise-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-  .status-active { background: #e8f5e9; color: #2e7d32; }
-  .status-inactive { background: #ffebee; color: #c62828; }
-  .entreprise-body { padding: 20px; }
+  .flow-bar { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:var(--radius-sm); padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
 
-  .section-card { border: 1.5px solid var(--green); border-radius: var(--radius-sm); margin-bottom: 12px; overflow: hidden; }
-  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--green-light); }
-  .section-title { font-size: 14px; font-weight: 700; color: #1a5c2a; }
-  .section-body { padding: 12px 14px; }
+  .admin-selector { background:linear-gradient(135deg,#fff3e0,#fff8e1); border:2px solid var(--orange); border-radius:var(--radius); padding:16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .admin-selector label { font-weight:700; color:#e65100; font-size:14px; white-space:nowrap; }
+  .admin-selector select { margin:0; max-width:300px; width:auto; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--radius-sm); font-size:14px; font-family:inherit; background:#fafafa; }
 
-  .question-card {
-    background: #f8fffe; border: 1px solid #c8e6c9; border-right: 4px solid var(--green);
-    border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px;
-  }
-  .question-card .q-text { font-weight: 600; font-size: 14px; color: #1a1a1a; margin-bottom: 4px; }
-  .question-card .q-desc { font-size: 12px; color: #777; background: #e3f2fd; padding: 5px 8px; border-radius: 4px; margin: 5px 0; }
-  .question-card .q-answer { font-size: 13px; color: #444; margin-bottom: 6px; }
-  .question-card .q-audio { font-size: 12px; color: var(--blue); }
+  .tabs { display:flex; border-bottom:2px solid #e0e0e0; margin-bottom:20px; }
+  .tab { padding:10px 20px; font-size:14px; font-weight:600; color:#888; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+  .tab.active { color:var(--green); border-bottom-color:var(--green); }
 
-  .add-zone { background: #f9f9f9; border: 1.5px dashed #ccc; border-radius: var(--radius-sm); padding: 14px; margin-top: 10px; }
-  .add-zone-title { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 10px; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:#323232; color:white; padding:12px 24px; border-radius:24px; font-size:14px; z-index:9999; transition:transform 0.3s; white-space:nowrap; pointer-events:none; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  .toast.success { background:#2e7d32; }
+  .toast.error   { background:#c62828; }
+  .toast.info    { background:#1565C0; }
 
-  .new-section-zone {
-    background: var(--green-light); border: 1.5px dashed var(--green);
-    border-radius: var(--radius-sm); padding: 14px; margin-top: 14px;
-    display: flex; gap: 10px; align-items: center;
-  }
-  .new-section-zone input { margin: 0; }
+  .loading { text-align:center; padding:30px; color:#aaa; }
+  .spinner { display:inline-block; width:24px; height:24px; border:3px solid #e0e0e0; border-top-color:var(--green); border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
-  .admin-selector {
-    background: linear-gradient(135deg, #fff3e0, #fff8e1); border: 2px solid var(--orange);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  }
-  .admin-selector label { font-weight: 700; color: #e65100; font-size: 14px; white-space: nowrap; }
-  .admin-selector select { margin: 0; max-width: 300px; }
+  .grid-2 { display:grid; grid-template-columns:120px 1fr; gap:10px; }
 
-  /* ── CLIENT WELCOME BANNER ── */
-  .client-banner {
-    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
-    border: 2px solid var(--green);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .client-banner-icon { font-size: 36px; }
-  .client-banner-text h3 { font-size: 16px; font-weight: 700; color: #1b5e20; margin-bottom: 4px; }
-  .client-banner-text p { font-size: 13px; color: #388e3c; }
-
-  .empty-state { text-align: center; padding: 40px 20px; color: #aaa; }
-  .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; }
-
-  .loading { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
-  .spinner {
-    display: inline-block; width: 24px; height: 24px; border: 3px solid #e0e0e0;
-    border-top-color: var(--green); border-radius: 50%;
-    animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .toast {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%) translateY(80px); background: #323232; color: white;
-    padding: 12px 24px; border-radius: 24px; font-size: 14px; z-index: 9999;
-    transition: transform 0.3s ease; white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success { background: #2e7d32; }
-  .toast.error { background: #c62828; }
-
-  .tabs { display: flex; gap: 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
-  .tab {
-    padding: 10px 20px; font-size: 14px; font-weight: 600; color: #888; cursor: pointer;
-    border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s;
-  }
-  .tab.active { color: var(--green); border-bottom-color: var(--green); }
-  .tab:hover:not(.active) { color: #444; }
-
-  @media (max-width: 600px) {
-    .header { padding: 0 14px; }
-    .container { padding: 14px 10px; }
-    .entreprise-header { flex-direction: column; align-items: flex-start; }
-    .new-section-zone { flex-direction: column; }
-    .admin-selector { flex-direction: column; align-items: flex-start; }
-    .client-banner { flex-direction: column; text-align: center; }
+  @media (max-width:600px) {
+    .header { padding:0 14px; }
+    .container { padding:14px 10px; }
+    .entreprise-header, .admin-selector { flex-direction:column; }
+    .grid-2 { grid-template-columns:1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ═══ LOGIN ═══ -->
 <div id="login-page">
   <div class="login-box">
     <div class="login-logo">🤖</div>
     <div class="login-title">Dashboard WhatsApp Bot</div>
-    <div class="login-subtitle">سجّل دخولك للوصول إلى لوحة التحكم</div>
-    <input class="login-input" type="text" id="login-numero" placeholder="رقم WhatsApp (مثال: 212612838772)" autocomplete="off">
-    <input class="login-input" type="password" id="login-password" placeholder="كلمة المرور" autocomplete="current-password">
+    <div class="login-subtitle">نظام الاستبيان متعدد الخطوات</div>
+    <input class="login-input" type="text"     id="login-numero"   placeholder="رقم WhatsApp">
+    <input class="login-input" type="password" id="login-password" placeholder="كلمة المرور">
     <button class="login-btn" onclick="login()">🔐 تسجيل الدخول</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ═══ APP ═══ -->
 <div id="app-page">
   <header class="header">
-    <div class="header-left">
+    <div style="display:flex;align-items:center;gap:12px">
       <span style="font-size:24px">🤖</span>
       <div>
-        <div class="header-title">Dashboard WhatsApp Bot</div>
+        <div class="header-title">Dashboard Bot WhatsApp</div>
         <div class="header-subtitle" id="header-subtitle">لوحة التحكم</div>
       </div>
     </div>
     <div class="user-badge" onclick="logout()">
-      <span id="header-username">المستخدم</span>
+      <span id="header-username"></span>
       <span class="role-chip" id="header-role-chip">CLIENT</span>
       <span>🚪</span>
     </div>
@@ -246,68 +148,43 @@
 
   <div class="container">
 
-    <!-- TABS — Admin seulement -->
     <div class="tabs" id="admin-tabs" style="display:none">
       <div class="tab active" onclick="switchTab('entreprises')">🏢 الشركات</div>
       <div class="tab" onclick="switchTab('users')">👥 المستخدمين</div>
     </div>
 
-    <!-- TAB ENTREPRISES -->
     <div id="tab-entreprises">
 
-      <!-- Sélecteur Admin -->
       <div class="admin-selector" id="admin-selector" style="display:none">
-        <label>🔧 وضع المدير — تعديل شركة :</label>
-        <select id="admin-select-entreprise" onchange="adminSelectEntreprise()">
-          <option value="">— اختر شركة —</option>
+        <label>🔧 وضع المدير :</label>
+        <select id="admin-select" onchange="adminSelect()">
+          <option value="">— عرض الكل —</option>
         </select>
-        <button class="btn btn-green btn-sm" onclick="showAddEntrepriseForm()">➕ شركة جديدة</button>
+        <button class="btn btn-green btn-sm" onclick="showAddForm()">➕ شركة جديدة</button>
       </div>
 
-      <!-- Formulaire ajout entreprise — Admin seulement -->
-      <div class="card" id="add-entreprise-card" style="display:none">
+      <div class="card" id="add-card" style="display:none">
         <div class="card-title"><div class="card-title-dot"></div>➕ إضافة شركة جديدة</div>
-        <div class="form-group"><label>اسم الشركة</label><input type="text" id="nom" placeholder="مثال: Boutique Moda"></div>
-        <div class="form-group"><label>رقم WhatsApp</label><input type="text" id="numero" placeholder="مثال: 212612838772"></div>
-        <div class="form-group"><label>كلمة مرور الشركة</label><input type="text" id="motdepasse" placeholder="مثال: boutique123"></div>
-        <div class="form-group"><label>رسالة الترحيب</label><textarea id="salutation" placeholder="مرحبا بك ! 👋"></textarea></div>
-        <button class="btn btn-green" onclick="ajouterEntreprise()">✅ إضافة الشركة</button>
-        <button class="btn btn-red" onclick="hideAddEntrepriseForm()" style="margin-right:8px">❌ إلغاء</button>
+        <div class="form-group"><label>اسم الشركة</label><input type="text" id="new-nom" placeholder="Boutique Moda"></div>
+        <div class="form-group"><label>رقم WhatsApp</label><input type="text" id="new-numero" placeholder="212612838772"></div>
+        <div class="form-group"><label>كلمة مرور العميل</label><input type="text" id="new-password" placeholder="boutique123"></div>
+        <div class="form-group"><label>رسالة الترحيب</label><textarea id="new-salutation" placeholder="مرحبا بك ! 👋"></textarea></div>
+        <div class="form-group"><label>رسالة الخاتمة</label><textarea id="new-recap" placeholder="شكراً ! سنتواصل معك قريباً 😊"></textarea></div>
+        <button class="btn btn-green" onclick="ajouterEntreprise()">✅ إضافة</button>
+        <button class="btn btn-red" onclick="hideAddForm()" style="margin-right:8px">❌ إلغاء</button>
       </div>
 
-      <!-- Zone Admin : liste toutes les entreprises -->
-      <div id="zone-admin" style="display:none">
-        <div class="card">
-          <div class="card-title"><div class="card-title-dot"></div>🏢 قائمة الشركات</div>
-          <div id="liste-entreprises-admin">
-            <div class="loading"><span class="spinner"></span> جاري التحميل...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Zone Client : sa propre entreprise uniquement -->
-      <div id="zone-client" style="display:none">
-        <!-- Banner de bienvenue -->
-        <div class="client-banner" id="client-banner">
-          <div class="client-banner-icon">🏢</div>
-          <div class="client-banner-text">
-            <h3 id="client-nom-entreprise">شركتك</h3>
-            <p>يمكنك إضافة وحذف الأقسام والأسئلة الخاصة بك</p>
-          </div>
-        </div>
-        <!-- Contenu entreprise client -->
-        <div id="liste-entreprises-client">
-          <div class="loading"><span class="spinner"></span> جاري التحميل...</div>
-        </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-dot"></div>🏢 الشركات والاستبيانات</div>
+        <div id="liste-entreprises"><div class="loading"><span class="spinner"></span></div></div>
       </div>
 
     </div>
 
-    <!-- TAB USERS — Admin seulement -->
     <div id="tab-users" style="display:none">
       <div class="card">
-        <div class="card-title"><div class="card-title-dot"></div>👥 إدارة المستخدمين</div>
-        <div id="liste-users"><div class="loading"><span class="spinner"></span> جاري التحميل...</div></div>
+        <div class="card-title"><div class="card-title-dot"></div>👥 المستخدمين</div>
+        <div id="liste-users"></div>
       </div>
     </div>
 
@@ -317,51 +194,57 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'https://web-production-53c34.up.railway.app';
+// ═══════════════════════════════════════════
+// CONFIG — CHANGEZ CES VALEURS
+// ═══════════════════════════════════════════
+const API          = 'https://web-production-53c34.up.railway.app';
+const ADMIN_NUMERO = '212600000000';
+const ADMIN_KEY    = 'admin@2025!';
 
-// ══ CHANGEZ CES 2 VALEURS ══
-const ADMIN_NUMERO   = '212600000000';
-const ADMIN_PASSWORD = 'admin@2025!';
-// ═══════════════════════════
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentUser     = null;
+let allEntreprises  = [];
+let selectedAdminId = null;
 
-let currentUser = null;
-let allEntreprises = [];
-let selectedAdminEntrepriseId = null;
-
-// ─── LOGIN ────────────────────────────────────────────
-
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
 async function login() {
   const numero   = document.getElementById('login-numero').value.trim();
   const password = document.getElementById('login-password').value.trim();
   if (!numero || !password) return showLoginError('يرجى ملء جميع الحقول');
 
-  // Admin
-  if (numero === ADMIN_NUMERO && password === ADMIN_PASSWORD) {
-    currentUser = { numero, role: 'admin', nom: 'المدير' };
+  // ADMIN
+  if (numero === ADMIN_NUMERO && password === ADMIN_KEY) {
+    currentUser = { numero, role:'admin', nom:'👑 المدير', motdepasse:ADMIN_KEY };
     startApp();
+    await chargerEntreprises();
     return;
   }
 
-  // Client
+  // CLIENT
   try {
-    const res  = await fetch(`${API}/api/entreprises`);
+    const res  = await fetch(`${API}/api/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ numeroWhatsApp:numero, motdepasse:password })
+    });
     const data = await res.json();
-    const entreprise = data.find(e => e.numeroWhatsApp === numero && e.motdepasse === password);
-    if (entreprise) {
-      currentUser = { numero, role: 'client', nom: entreprise.nom, entrepriseId: entreprise._id };
+    if (res.ok && data.entreprise) {
+      currentUser = { numero, role:'client', nom:data.entreprise.nom, motdepasse:password, entrepriseId:data.entreprise._id };
+      allEntreprises = [data.entreprise];
       startApp();
+      afficherEntreprises();
     } else {
-      showLoginError('رقم أو كلمة مرور غير صحيحة');
+      showLoginError(data.error || 'رقم أو كلمة مرور غير صحيحة');
     }
-  } catch (e) {
-    showLoginError('خطأ في الاتصال بالخادم');
-  }
+  } catch(e) { showLoginError('خطأ في الاتصال بالخادم'); }
 }
 
 function showLoginError(msg) {
   const el = document.getElementById('login-error');
-  el.textContent = '❌ ' + msg;
-  el.style.display = 'block';
+  el.textContent = '❌ ' + msg; el.style.display = 'block';
   setTimeout(() => el.style.display = 'none', 3000);
 }
 
@@ -369,366 +252,393 @@ function startApp() {
   document.getElementById('login-page').style.display = 'none';
   document.getElementById('app-page').style.display   = 'block';
   document.getElementById('header-username').textContent = currentUser.nom;
-
   const chip = document.getElementById('header-role-chip');
-
   if (currentUser.role === 'admin') {
-    chip.textContent = 'ADMIN';
-    chip.classList.add('admin');
-    document.getElementById('admin-tabs').style.display    = 'flex';
+    chip.textContent = 'ADMIN'; chip.classList.add('admin');
+    document.getElementById('admin-tabs').style.display     = 'flex';
     document.getElementById('admin-selector').style.display = 'flex';
-    document.getElementById('zone-admin').style.display    = 'block';
-    document.getElementById('zone-client').style.display   = 'none';
-    document.getElementById('header-subtitle').textContent = 'وضع المدير — صلاحيات كاملة';
+    document.getElementById('header-subtitle').textContent  = 'وضع المدير — صلاحيات كاملة';
   } else {
     chip.textContent = 'CLIENT';
-    document.getElementById('admin-tabs').style.display    = 'none';
-    document.getElementById('admin-selector').style.display = 'none';
-    document.getElementById('zone-admin').style.display    = 'none';
-    document.getElementById('zone-client').style.display   = 'block';
     document.getElementById('header-subtitle').textContent = currentUser.nom;
   }
-
-  chargerEntreprises();
 }
 
 function logout() {
-  if (!confirm('هل تريد تسجيل الخروج ؟')) return;
-  currentUser = null; allEntreprises = []; selectedAdminEntrepriseId = null;
+  if (!confirm('تسجيل الخروج ؟')) return;
+  currentUser = null; allEntreprises = []; selectedAdminId = null;
   document.getElementById('app-page').style.display  = 'none';
   document.getElementById('login-page').style.display = 'flex';
-  document.getElementById('login-numero').value  = '';
+  document.getElementById('login-numero').value = '';
   document.getElementById('login-password').value = '';
-  // Reset zones
-  document.getElementById('zone-admin').style.display  = 'none';
-  document.getElementById('zone-client').style.display = 'none';
 }
 
-// ─── TABS ─────────────────────────────────────────────
-
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t, i) =>
-    t.classList.toggle('active', i === (tab === 'entreprises' ? 0 : 1))
-  );
-  document.getElementById('tab-entreprises').style.display = tab === 'entreprises' ? 'block' : 'none';
-  document.getElementById('tab-users').style.display       = tab === 'users'       ? 'block' : 'none';
-  if (tab === 'users') afficherUsers();
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===(tab==='entreprises'?0:1)));
+  document.getElementById('tab-entreprises').style.display = tab==='entreprises'?'block':'none';
+  document.getElementById('tab-users').style.display       = tab==='users'?'block':'none';
+  if (tab==='users') afficherUsers();
 }
 
-// ─── CHARGER ──────────────────────────────────────────
-
+// ═══════════════════════════════════════════
+// CHARGER DEPUIS SERVEUR
+// ═══════════════════════════════════════════
 async function chargerEntreprises() {
+  document.getElementById('liste-entreprises').innerHTML = '<div class="loading"><span class="spinner"></span></div>';
   try {
-    const res = await fetch(`${API}/api/entreprises`);
+    const res = await fetch(`${API}/api/entreprises`, { headers:{'x-admin-key':ADMIN_KEY} });
     allEntreprises = await res.json();
 
-    if (currentUser.role === 'admin') {
-      // Mettre à jour le select
-      const sel  = document.getElementById('admin-select-entreprise');
-      const prev = sel.value;
-      sel.innerHTML = '<option value="">— اختر شركة —</option>' +
-        allEntreprises.map(e => `<option value="${e._id}">${e.nom} (${e.numeroWhatsApp})</option>`).join('');
-      if (prev) sel.value = prev;
-      afficherEntreprisesAdmin();
-    } else {
-      afficherEntrepriseClient();
-    }
+    // Mettre à jour le sélecteur admin
+    const sel  = document.getElementById('admin-select');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— عرض الكل —</option>' +
+      allEntreprises.map(e => `<option value="${e._id}">${e.nom} (${e.numeroWhatsApp})</option>`).join('');
+    if (prev) sel.value = prev;
+
+    afficherEntreprises();
   } catch(e) {
-    showToast('❌ خطأ في الاتصال بالخادم', 'error');
+    document.getElementById('liste-entreprises').innerHTML = '<p style="color:red;text-align:center;padding:20px">❌ خطأ في الاتصال</p>';
   }
 }
 
-// ─── AFFICHER ADMIN (toutes les entreprises) ──────────
-
-function afficherEntreprisesAdmin() {
-  const div = document.getElementById('liste-entreprises-admin');
-  let entreprises = selectedAdminEntrepriseId
-    ? allEntreprises.filter(e => e._id === selectedAdminEntrepriseId)
+// ═══════════════════════════════════════════
+// AFFICHER
+// ═══════════════════════════════════════════
+function afficherEntreprises() {
+  const div     = document.getElementById('liste-entreprises');
+  const isAdmin = currentUser.role === 'admin';
+  const liste   = isAdmin
+    ? (selectedAdminId ? allEntreprises.filter(e=>e._id===selectedAdminId) : allEntreprises)
     : allEntreprises;
 
-  if (entreprises.length === 0) {
-    div.innerHTML = `<div class="empty-state"><div class="empty-icon">🏢</div><p>لا توجد شركات. أضف شركة جديدة.</p></div>`;
+  if (!liste.length) {
+    div.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa"><p style="font-size:40px">🏢</p><p>لا توجد شركات.</p></div>';
     return;
   }
-  div.innerHTML = entreprises.map(e => renderEntreprise(e, true)).join('');
+  div.innerHTML = liste.map(e => renderEntreprise(e)).join('');
 }
 
-// ─── AFFICHER CLIENT (sa propre entreprise seulement) ─
+function renderEntreprise(e) {
+  const isAdmin = currentUser.role === 'admin';
+  const etapes  = [...(e.etapes||[])].sort((a,b)=>a.ordre-b.ordre);
+  const eid     = e._id;
 
-function afficherEntrepriseClient() {
-  const div = document.getElementById('liste-entreprises-client');
-  const entreprise = allEntreprises.find(e => e._id === currentUser.entrepriseId);
-
-  if (!entreprise) {
-    div.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>لم يتم العثور على شركتك. تواصل مع المدير.</p></div>`;
-    return;
-  }
-
-  // Mettre à jour le banner
-  document.getElementById('client-nom-entreprise').textContent = '🏢 ' + entreprise.nom;
-
-  // Afficher uniquement le contenu (sections + questions) sans le header admin
-  div.innerHTML = renderEntrepriseClientContent(entreprise);
-}
-
-// ─── RENDER ENTREPRISE (Admin) ────────────────────────
-
-function renderEntreprise(e, isAdmin) {
   return `
-    <div class="entreprise-card">
-      <div class="entreprise-header">
-        <div class="entreprise-info">
-          <h3>🏢 ${e.nom}</h3>
-          <p>📱 ${e.numeroWhatsApp}</p>
-          <p style="margin-top:3px">👋 ${e.salutation}</p>
-        </div>
-        <div class="entreprise-actions">
-          <span class="status-badge ${e.actif ? 'status-active' : 'status-inactive'}">
-            ${e.actif ? '✅ نشط' : '❌ متوقف'}
-          </span>
-          <button class="btn btn-orange btn-sm" onclick="toggleActif('${e._id}', ${e.actif})">
-            ${e.actif ? '⏸ إيقاف' : '▶️ تشغيل'}
-          </button>
-          <button class="btn btn-red btn-sm" onclick="supprimerEntreprise('${e._id}')">🗑️ حذف</button>
-        </div>
+  <div class="entreprise-card">
+    <div class="entreprise-header">
+      <div class="entreprise-info">
+        <h3>🏢 ${e.nom}</h3>
+        <p>📱 ${e.numeroWhatsApp}</p>
+        <p>👋 ${e.salutation}</p>
+        <p>🏁 ${e.messageRecap||'—'}</p>
+        ${isAdmin?`<p style="color:#aaa;font-size:11px">🔑 ${e.motdepasse||'—'}</p>`:''}
       </div>
-      <div class="entreprise-body">
-        <h4 style="font-size:13px;color:#555;margin-bottom:12px">📋 الأقسام والأسئلة :</h4>
-        ${e.sections.length === 0
-          ? '<p style="color:#aaa;font-size:13px">لا توجد أقسام بعد.</p>'
-          : e.sections.map((s, si) => renderSection(e, s, si)).join('')}
-        <div class="new-section-zone">
-          <label style="font-size:13px;font-weight:700;color:#2e7d32;white-space:nowrap">➕ قسم جديد :</label>
-          <input type="text" id="section_${e._id}" placeholder="اسم القسم">
-          <button class="btn btn-green btn-sm" onclick="ajouterSection('${e._id}')">إضافة</button>
-        </div>
+      <div class="entreprise-actions">
+        <span class="${e.actif?'status-active':'status-inactive'}">${e.actif?'✅ نشط':'❌ متوقف'}</span>
+        ${isAdmin?`
+          <button class="btn btn-orange btn-sm" onclick="toggleActif('${eid}',${e.actif})">${e.actif?'⏸ إيقاف':'▶️ تشغيل'}</button>
+          <button class="btn btn-red btn-sm" onclick="supprimerEntreprise('${eid}')">🗑️ حذف</button>
+        `:''}
       </div>
-    </div>`;
+    </div>
+
+    <div class="entreprise-body">
+
+      <!-- FLOW BAR -->
+      ${etapes.length>0?`
+        <div class="flow-bar">
+          <span style="font-size:12px;color:var(--green)">▶️ البداية</span>
+          ${etapes.map(et=>`
+            <span style="color:#555">→</span>
+            <span style="background:var(--purple);color:white;padding:3px 10px;border-radius:12px;font-size:12px">${et.titre}</span>
+          `).join('')}
+          <span style="color:#555">→</span>
+          <span style="background:var(--green);color:white;padding:3px 10px;border-radius:12px;font-size:12px">📋 الملخص</span>
+        </div>
+      `:''}
+
+      <p style="font-size:13px;color:#555;margin-bottom:12px;font-weight:600">📋 الخطوات والخيارات (${etapes.length}) :</p>
+
+      <!-- ÉTAPES -->
+      ${etapes.length===0
+        ?'<p style="color:#aaa;font-size:13px;margin-bottom:12px">لا توجد خطوات بعد. أضف خطوة أولى !</p>'
+        :etapes.map((et,ei)=>renderEtape(eid,et,ei)).join('')}
+
+      <!-- AJOUTER ÉTAPE -->
+      <div class="add-etape-zone">
+        <div class="add-zone-title" style="color:var(--purple)">➕ إضافة خطوة جديدة :</div>
+        <div class="grid-2" style="margin-bottom:10px">
+          <div class="form-group" style="margin:0">
+            <label>رقم الترتيب</label>
+            <input type="number" id="et_ordre_${eid}" value="${etapes.length+1}" min="1">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>عنوان الخطوة</label>
+            <input type="text" id="et_titre_${eid}" placeholder="مثال: نوع المنتج">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>السؤال</label>
+          <input type="text" id="et_question_${eid}" placeholder="مثال: اختر نوع المنتج :">
+        </div>
+        <button class="btn btn-purple" onclick="ajouterEtape('${eid}')">➕ إضافة الخطوة</button>
+      </div>
+
+    </div>
+  </div>`;
 }
 
-// ─── RENDER CONTENU CLIENT (sans boutons admin) ───────
-
-function renderEntrepriseClientContent(e) {
+function renderEtape(eid, et, ei) {
+  const opts = et.options||[];
   return `
-    <div class="card" style="padding:0;overflow:hidden">
-      <div class="entreprise-body" style="padding:20px">
-        <h4 style="font-size:13px;color:#555;margin-bottom:12px">📋 الأقسام والأسئلة :</h4>
-        ${e.sections.length === 0
-          ? '<p style="color:#aaa;font-size:13px">لا توجد أقسام بعد. أضف قسمك الأول !</p>'
-          : e.sections.map((s, si) => renderSection(e, s, si)).join('')}
-        <div class="new-section-zone">
-          <label style="font-size:13px;font-weight:700;color:#2e7d32;white-space:nowrap">➕ قسم جديد :</label>
-          <input type="text" id="section_${e._id}" placeholder="اسم القسم">
-          <button class="btn btn-green btn-sm" onclick="ajouterSection('${e._id}')">إضافة</button>
+  <div class="etape-card">
+    <div class="etape-header">
+      <div class="etape-num">${et.ordre}</div>
+      <div class="etape-info">
+        <div class="etape-titre">📌 ${et.titre}</div>
+        <div class="etape-question">❓ ${et.question}</div>
+      </div>
+      <button class="btn btn-red btn-sm" onclick="supprimerEtape('${eid}',${ei})">🗑️ حذف</button>
+    </div>
+    <div class="etape-body">
+
+      <p style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">🎯 الخيارات (${opts.length}) :</p>
+
+      ${opts.length===0
+        ?'<p style="color:#aaa;font-size:12px;margin-bottom:8px">لا توجد خيارات بعد. أضف خياراً !</p>'
+        :opts.map((opt,oi)=>`
+          <div class="option-card">
+            <div>
+              <div class="option-texte">✦ ${opt.texte}</div>
+              ${opt.description?`<div class="option-desc">📝 ${opt.description}</div>`:''}
+            </div>
+            <button class="btn btn-red btn-sm" onclick="supprimerOption('${eid}',${ei},${oi})">🗑️</button>
+          </div>`).join('')}
+
+      <div class="add-zone">
+        <div class="add-zone-title">➕ إضافة خيار :</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+          <div class="form-group" style="margin:0">
+            <label>نص الخيار</label>
+            <input type="text" id="opt_texte_${eid}_${ei}" placeholder="مثال: قفطان">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>الوصف (اختياري)</label>
+            <input type="text" id="opt_desc_${eid}_${ei}" placeholder="مثال: قفاطن تقليدية">
+          </div>
         </div>
+        <button class="btn btn-blue btn-sm" onclick="ajouterOption('${eid}',${ei})">➕ إضافة الخيار</button>
       </div>
-    </div>`;
+
+    </div>
+  </div>`;
 }
 
-// ─── RENDER SECTION ───────────────────────────────────
+// ═══════════════════════════════════════════
+// ADMIN HELPERS
+// ═══════════════════════════════════════════
+function adminSelect() { selectedAdminId = document.getElementById('admin-select').value; afficherEntreprises(); }
+function showAddForm() { document.getElementById('add-card').style.display = 'block'; document.getElementById('add-card').scrollIntoView({behavior:'smooth'}); }
+function hideAddForm() { document.getElementById('add-card').style.display = 'none'; }
 
-function renderSection(e, s, si) {
-  return `
-    <div class="section-card">
-      <div class="section-header">
-        <span class="section-title">📌 ${s.titre}</span>
-        <button class="btn btn-red btn-sm" onclick="supprimerSection('${e._id}', ${si})">🗑️</button>
-      </div>
-      <div class="section-body">
-        ${s.questions.length === 0
-          ? '<p style="color:#aaa;font-size:12px;margin-bottom:8px">لا توجد أسئلة في هذا القسم.</p>'
-          : s.questions.map((q, qi) => `
-            <div class="question-card">
-              <p class="q-text">❓ ${q.question}</p>
-              ${q.description ? `<div class="q-desc">📝 ${q.description}</div>` : ''}
-              <p class="q-answer">💬 ${q.reponse}</p>
-              ${q.audioUrl ? `<p class="q-audio">🎵 <a href="${q.audioUrl}" target="_blank">استمع للصوت</a></p>` : ''}
-              <button class="btn btn-red btn-sm" onclick="supprimerQuestion('${e._id}', ${si}, ${qi})">🗑️ حذف السؤال</button>
-            </div>`).join('')}
-        <div class="add-zone">
-          <div class="add-zone-title">➕ إضافة سؤال :</div>
-          <div class="form-group"><label>السؤال</label><input type="text" id="q_${e._id}_${si}" placeholder="أدخل السؤال"></div>
-          <div class="form-group"><label>الوصف</label><textarea id="d_${e._id}_${si}" placeholder="وصف قصير اختياري"></textarea></div>
-          <div class="form-group"><label>الجواب</label><textarea id="r_${e._id}_${si}" placeholder="الجواب الكامل"></textarea></div>
-          <div class="form-group"><label>رابط الصوت (اختياري)</label><input type="text" id="a_${e._id}_${si}" placeholder="https://...mp3"></div>
-          <button class="btn btn-blue btn-sm" onclick="ajouterQuestion('${e._id}', ${si})">➕ إضافة السؤال</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-// ─── ADMIN SELECT ─────────────────────────────────────
-
-function adminSelectEntreprise() {
-  selectedAdminEntrepriseId = document.getElementById('admin-select-entreprise').value;
-  afficherEntreprisesAdmin();
-}
-function showAddEntrepriseForm() {
-  document.getElementById('add-entreprise-card').style.display = 'block';
-  document.getElementById('add-entreprise-card').scrollIntoView({ behavior: 'smooth' });
-}
-function hideAddEntrepriseForm() {
-  document.getElementById('add-entreprise-card').style.display = 'none';
-}
-
-// ─── CRUD ENTREPRISE ──────────────────────────────────
-
+// ═══════════════════════════════════════════
+// CRUD ENTREPRISE
+// ═══════════════════════════════════════════
 async function ajouterEntreprise() {
-  if (currentUser.role !== 'admin') return showToast('❌ غير مصرح', 'error');
-  const nom = document.getElementById('nom').value.trim();
-  const numero = document.getElementById('numero').value.trim();
-  const motdepasse = document.getElementById('motdepasse').value.trim();
-  const salutation = document.getElementById('salutation').value.trim();
-  if (!nom || !numero || !motdepasse || !salutation) return showToast('❌ يرجى ملء جميع الحقول', 'error');
+  const nom        = document.getElementById('new-nom').value.trim();
+  const numero     = document.getElementById('new-numero').value.trim();
+  const password   = document.getElementById('new-password').value.trim();
+  const salutation = document.getElementById('new-salutation').value.trim();
+  const recap      = document.getElementById('new-recap').value.trim();
+  if (!nom||!numero||!password||!salutation) return showToast('❌ يرجى ملء جميع الحقول','error');
 
+  showToast('⏳ جاري الإضافة...','info');
   await fetch(`${API}/api/entreprises`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nom, numeroWhatsApp: numero, motdepasse, salutation, sections: [], actif: true })
+    method:'POST', headers:{'Content-Type':'application/json','x-admin-key':ADMIN_KEY},
+    body: JSON.stringify({ nom, numeroWhatsApp:numero, motdepasse:password, salutation, messageRecap:recap, etapes:[], actif:true })
   });
-  document.getElementById('nom').value = '';
-  document.getElementById('numero').value = '';
-  document.getElementById('motdepasse').value = '';
-  document.getElementById('salutation').value = '';
-  hideAddEntrepriseForm();
-  showToast('✅ تمت إضافة الشركة !', 'success');
-  chargerEntreprises();
+  ['new-nom','new-numero','new-password','new-salutation','new-recap'].forEach(id=>document.getElementById(id).value='');
+  hideAddForm();
+  showToast('✅ تمت إضافة الشركة !','success');
+  await chargerEntreprises();
 }
 
 async function supprimerEntreprise(id) {
-  if (currentUser.role !== 'admin') return showToast('❌ غير مصرح', 'error');
-  if (!confirm('هل تريد حذف هذه الشركة نهائياً ؟')) return;
-  await fetch(`${API}/api/entreprises/${id}`, { method: 'DELETE' });
-  if (selectedAdminEntrepriseId === id) selectedAdminEntrepriseId = null;
-  showToast('🗑️ تم الحذف', 'success');
-  chargerEntreprises();
+  if (!confirm('حذف هذه الشركة نهائياً ؟')) return;
+  await fetch(`${API}/api/entreprises/${id}`, { method:'DELETE', headers:{'x-admin-key':ADMIN_KEY} });
+  if (selectedAdminId===id) selectedAdminId=null;
+  showToast('🗑️ تم الحذف','success');
+  await chargerEntreprises();
 }
 
 async function toggleActif(id, actif) {
-  if (currentUser.role !== 'admin') return showToast('❌ غير مصرح', 'error');
   await fetch(`${API}/api/entreprises/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ actif: !actif })
+    method:'PUT', headers:{'Content-Type':'application/json','x-admin-key':ADMIN_KEY},
+    body: JSON.stringify({ actif:!actif })
   });
-  showToast(actif ? '⏸ تم الإيقاف' : '▶️ تم التشغيل', 'success');
-  chargerEntreprises();
+  showToast(actif?'⏸ تم الإيقاف':'▶️ تم التشغيل','success');
+  await chargerEntreprises();
 }
 
-// ─── CRUD SECTION ─────────────────────────────────────
+// ═══════════════════════════════════════════
+// SAVE HELPER — LE PLUS IMPORTANT
+// ═══════════════════════════════════════════
+async function saveEntreprise(id, entreprise) {
+  // Préparer les headers
+  const headers = currentUser.role === 'admin'
+    ? { 'Content-Type':'application/json', 'x-admin-key':ADMIN_KEY }
+    : { 'Content-Type':'application/json', 'x-client-numero':currentUser.numero, 'x-client-password':currentUser.motdepasse };
 
-function checkOwnership(entrepriseId) {
-  if (currentUser.role === 'admin') return true;
-  if (currentUser.role === 'client' && currentUser.entrepriseId === entrepriseId) return true;
-  showToast('❌ غير مصرح', 'error');
-  return false;
-}
-
-async function ajouterSection(id) {
-  if (!checkOwnership(id)) return;
-  const titre = document.getElementById(`section_${id}`).value.trim();
-  if (!titre) return showToast('❌ أدخل اسم القسم', 'error');
-  const entreprise = allEntreprises.find(e => e._id === id);
-  entreprise.sections.push({ titre, questions: [] });
-  await fetch(`${API}/api/entreprises/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+  // Envoyer la requête
+  const res  = await fetch(`${API}/api/entreprises/${id}`, {
+    method: 'PUT',
+    headers: headers,
     body: JSON.stringify(entreprise)
   });
-  showToast('✅ تمت إضافة القسم !', 'success');
-  chargerEntreprises();
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.error('❌ Erreur save:', data);
+    showToast('❌ خطأ في الحفظ: ' + (data.error||''), 'error');
+    return false;
+  }
+
+  console.log('✅ Sauvegardé:', data);
+
+  // ✅ Recharger depuis le serveur (solution définitive)
+  if (currentUser.role === 'admin') {
+    await chargerEntreprises();
+  } else {
+    // Client: re-login pour rafraîchir
+    const r = await fetch(`${API}/api/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ numeroWhatsApp:currentUser.numero, motdepasse:currentUser.motdepasse })
+    });
+    const d = await r.json();
+    if (d.entreprise) {
+      allEntreprises = [d.entreprise];
+      afficherEntreprises();
+    }
+  }
+  return true;
 }
 
-async function supprimerSection(id, si) {
-  if (!checkOwnership(id)) return;
-  if (!confirm('هل تريد حذف هذا القسم وجميع أسئلته ؟')) return;
-  const entreprise = allEntreprises.find(e => e._id === id);
-  entreprise.sections.splice(si, 1);
-  await fetch(`${API}/api/entreprises/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(entreprise)
-  });
-  showToast('🗑️ تم حذف القسم', 'success');
-  chargerEntreprises();
+// ═══════════════════════════════════════════
+// CRUD ÉTAPES
+// ═══════════════════════════════════════════
+async function ajouterEtape(id) {
+  const ordreVal = document.getElementById(`et_ordre_${id}`).value;
+  const titre    = document.getElementById(`et_titre_${id}`).value.trim();
+  const question = document.getElementById(`et_question_${id}`).value.trim();
+
+  if (!ordreVal || !titre || !question) {
+    return showToast('❌ أدخل رقم الترتيب، العنوان، والسؤال', 'error');
+  }
+
+  const ordre = parseInt(ordreVal);
+
+  // Copie profonde de l'entreprise
+  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
+  if (!entreprise.etapes) entreprise.etapes = [];
+
+  // Vérifier doublon
+  if (entreprise.etapes.find(et=>et.ordre===ordre)) {
+    return showToast(`❌ الترتيب ${ordre} موجود مسبقاً !`, 'error');
+  }
+
+  // Ajouter l'étape
+  entreprise.etapes.push({ ordre, titre, question, options:[] });
+  entreprise.etapes.sort((a,b)=>a.ordre-b.ordre);
+
+  showToast('⏳ جاري الحفظ...', 'info');
+  const ok = await saveEntreprise(id, entreprise);
+  if (ok) showToast('✅ تمت إضافة الخطوة !', 'success');
 }
 
-// ─── CRUD QUESTION ────────────────────────────────────
-
-async function ajouterQuestion(id, si) {
-  if (!checkOwnership(id)) return;
-  const question    = document.getElementById(`q_${id}_${si}`).value.trim();
-  const description = document.getElementById(`d_${id}_${si}`).value.trim();
-  const reponse     = document.getElementById(`r_${id}_${si}`).value.trim();
-  const audioUrl    = document.getElementById(`a_${id}_${si}`).value.trim();
-  if (!question || !reponse) return showToast('❌ أدخل السؤال والجواب على الأقل', 'error');
-  const entreprise = allEntreprises.find(e => e._id === id);
-  entreprise.sections[si].questions.push({ question, description, reponse, audioUrl });
-  await fetch(`${API}/api/entreprises/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(entreprise)
-  });
-  showToast('✅ تمت إضافة السؤال !', 'success');
-  chargerEntreprises();
+async function supprimerEtape(id, ei) {
+  if (!confirm('حذف هذه الخطوة وجميع خياراتها ؟')) return;
+  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
+  entreprise.etapes.splice(ei, 1);
+  showToast('⏳ جاري الحفظ...', 'info');
+  const ok = await saveEntreprise(id, entreprise);
+  if (ok) showToast('🗑️ تم حذف الخطوة', 'success');
 }
 
-async function supprimerQuestion(id, si, qi) {
-  if (!checkOwnership(id)) return;
-  if (!confirm('هل تريد حذف هذا السؤال ؟')) return;
-  const entreprise = allEntreprises.find(e => e._id === id);
-  entreprise.sections[si].questions.splice(qi, 1);
-  await fetch(`${API}/api/entreprises/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(entreprise)
-  });
-  showToast('🗑️ تم حذف السؤال', 'success');
-  chargerEntreprises();
+// ═══════════════════════════════════════════
+// CRUD OPTIONS
+// ═══════════════════════════════════════════
+async function ajouterOption(id, ei) {
+  const texte = document.getElementById(`opt_texte_${id}_${ei}`).value.trim();
+  const desc  = document.getElementById(`opt_desc_${id}_${ei}`).value.trim();
+  if (!texte) return showToast('❌ أدخل نص الخيار', 'error');
+
+  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
+  if (!entreprise.etapes[ei].options) entreprise.etapes[ei].options = [];
+  entreprise.etapes[ei].options.push({ texte, description:desc });
+
+  showToast('⏳ جاري الحفظ...', 'info');
+  const ok = await saveEntreprise(id, entreprise);
+  if (ok) showToast('✅ تمت إضافة الخيار !', 'success');
 }
 
-// ─── USERS TAB ────────────────────────────────────────
+async function supprimerOption(id, ei, oi) {
+  if (!confirm('حذف هذا الخيار ؟')) return;
+  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
+  entreprise.etapes[ei].options.splice(oi, 1);
+  showToast('⏳ جاري الحفظ...', 'info');
+  const ok = await saveEntreprise(id, entreprise);
+  if (ok) showToast('🗑️ تم حذف الخيار', 'success');
+}
 
+// ═══════════════════════════════════════════
+// USERS TAB
+// ═══════════════════════════════════════════
 function afficherUsers() {
   const div = document.getElementById('liste-users');
-  if (allEntreprises.length === 0) {
-    div.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد مستخدمون بعد.</p></div>';
+  if (!allEntreprises.length) {
+    div.innerHTML = '<p style="text-align:center;padding:40px;color:#aaa">لا يوجد مستخدمون.</p>';
     return;
   }
   div.innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead>
-        <tr style="background:#f5f5f5;text-align:right">
-          <th style="padding:10px 14px;border-bottom:2px solid #eee">الشركة</th>
-          <th style="padding:10px 14px;border-bottom:2px solid #eee">رقم WhatsApp</th>
-          <th style="padding:10px 14px;border-bottom:2px solid #eee">كلمة المرور</th>
-          <th style="padding:10px 14px;border-bottom:2px solid #eee">الحالة</th>
-          <th style="padding:10px 14px;border-bottom:2px solid #eee">الأقسام</th>
-          <th style="padding:10px 14px;border-bottom:2px solid #eee">الأسئلة</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${allEntreprises.map(e => `
-          <tr style="border-bottom:1px solid #f0f0f0">
-            <td style="padding:10px 14px;font-weight:600">🏢 ${e.nom}</td>
-            <td style="padding:10px 14px">📱 ${e.numeroWhatsApp}</td>
-            <td style="padding:10px 14px">
-              <span style="background:#f5f5f5;padding:3px 8px;border-radius:4px;font-family:monospace">${e.motdepasse || '—'}</span>
-            </td>
-            <td style="padding:10px 14px">
-              <span class="status-badge ${e.actif ? 'status-active' : 'status-inactive'}">${e.actif ? 'نشط' : 'متوقف'}</span>
-            </td>
-            <td style="padding:10px 14px;text-align:center">${e.sections.length}</td>
-            <td style="padding:10px 14px;text-align:center">${e.sections.reduce((s, sec) => s + sec.questions.length, 0)}</td>
-          </tr>`).join('')}
+      <thead><tr style="background:#f5f5f5;text-align:right">
+        <th style="padding:10px;border-bottom:2px solid #eee">الشركة</th>
+        <th style="padding:10px;border-bottom:2px solid #eee">رقم WhatsApp</th>
+        <th style="padding:10px;border-bottom:2px solid #eee">كلمة المرور</th>
+        <th style="padding:10px;border-bottom:2px solid #eee">الحالة</th>
+        <th style="padding:10px;border-bottom:2px solid #eee">الخطوات</th>
+        <th style="padding:10px;border-bottom:2px solid #eee">الخيارات</th>
+      </tr></thead>
+      <tbody>${allEntreprises.map(e=>`
+        <tr style="border-bottom:1px solid #f0f0f0">
+          <td style="padding:10px;font-weight:600">🏢 ${e.nom}</td>
+          <td style="padding:10px">📱 ${e.numeroWhatsApp}</td>
+          <td style="padding:10px"><span style="background:#f5f5f5;padding:3px 8px;border-radius:4px;font-family:monospace">${e.motdepasse||'—'}</span></td>
+          <td style="padding:10px"><span class="${e.actif?'status-active':'status-inactive'}">${e.actif?'نشط':'متوقف'}</span></td>
+          <td style="padding:10px;text-align:center">${(e.etapes||[]).length}</td>
+          <td style="padding:10px;text-align:center">${(e.etapes||[]).reduce((s,et)=>s+(et.options||[]).length,0)}</td>
+        </tr>`).join('')}
       </tbody>
     </table>`;
 }
 
-// ─── TOAST ────────────────────────────────────────────
-
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
 let toastTimer;
-function showToast(msg, type = '') {
+function showToast(msg, type='') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast' + (type ? ' ' + type : '');
+  t.className = 'toast' + (type ? ' '+type : '');
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  if (type !== 'info') {
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
 }
 
 document.getElementById('login-password').addEventListener('keydown', e => {

@@ -10,25 +10,26 @@ app.use(cors());
 
 const sessions = new Map();
 
-// ✅ Schéma MongoDB avec description et audio
-const questionSchema = new mongoose.Schema({
-  question: String,
-  description: String,
-  reponse: String,
-  audioUrl: String
+// ✅ Schéma MongoDB
+const optionSchema = new mongoose.Schema({
+  texte: String,
+  description: String
 });
 
-const sectionSchema = new mongoose.Schema({
+const etapeSchema = new mongoose.Schema({
+  ordre: Number,
   titre: String,
-  questions: [questionSchema]
+  question: String,
+  options: [optionSchema]
 });
 
 const entrepriseSchema = new mongoose.Schema({
   nom: String,
   numeroWhatsApp: String,
-  motdepasse: String,        // ← NOUVEAU : mot de passe client dashboard
+  motdepasse: String,
   salutation: String,
-  sections: [sectionSchema],
+  messageRecap: String,
+  etapes: [etapeSchema],
   actif: { type: Boolean, default: true }
 });
 
@@ -51,48 +52,40 @@ const connectMongoDB = async () => {
       await Entreprise.create({
         nom: "Boutique Test",
         numeroWhatsApp: "212612838772",
-        motdepasse: "boutique123",   // ← mot de passe par défaut pour le test
-        salutation: "مرحبا بك ! 👋 كيف يمكنني مساعدتك ؟",
+        motdepasse: "boutique123",
+        salutation: "مرحبا بك ! 👋 سنساعدك في اختيار المنتج المناسب",
+        messageRecap: "شكراً على اختياراتك ! سنتواصل معك قريباً 😊",
         actif: true,
-        sections: [
+        etapes: [
           {
-            titre: "معلومات عامة",
-            questions: [
-              {
-                question: "شحال ثمن الخدمة",
-                description: "شحال ثمن الخدمة واش لشهر ولا العام",
-                reponse: "الخدمة ديالنا تبدا من 200 درهم فالشهر",
-                audioUrl: ""
-              },
-              {
-                question: "فين كاينين",
-                description: "العنوان ديالنا وكيفاش توصل لينا",
-                reponse: "كاينين فمكناس، المغرب",
-                audioUrl: ""
-              },
-              {
-                question: "شنو هي أوقات العمل",
-                description: "أوقات فتح الدكان",
-                reponse: "من 9 الصباح حتى 6 العشية",
-                audioUrl: ""
-              }
+            ordre: 1,
+            titre: "نوع المنتج",
+            question: "اختر نوع المنتج الذي تبحث عنه :",
+            options: [
+              { texte: "قفطان", description: "قفاطن تقليدية وعصرية" },
+              { texte: "جلابة", description: "جلابة رجالية ونسائية" },
+              { texte: "تكشيطة", description: "تكشيطة للمناسبات" }
             ]
           },
           {
-            titre: "الدعم التقني",
-            questions: [
-              {
-                question: "كيفاش نتواصل معاكم",
-                description: "طرق التواصل معانا",
-                reponse: "يمكنك الاتصال بنا على: 0600000000",
-                audioUrl: ""
-              },
-              {
-                question: "واش كاين توصيل",
-                description: "التوصيل الى البيت",
-                reponse: "يه ! التوصيل متاح لجميع مدن المغرب",
-                audioUrl: ""
-              }
+            ordre: 2,
+            titre: "المقاس",
+            question: "اختر مقاسك :",
+            options: [
+              { texte: "S — صغير", description: "للأشخاص النحيفين" },
+              { texte: "M — وسط", description: "المقاس الأكثر طلباً" },
+              { texte: "L — كبير", description: "للأشخاص العاديين" },
+              { texte: "XL — كبير جداً", description: "للأشخاص الضخام" }
+            ]
+          },
+          {
+            ordre: 3,
+            titre: "الميزانية",
+            question: "ما هي ميزانيتك ؟",
+            options: [
+              { texte: "500-1000 درهم", description: "جودة عالية بسعر مناسب" },
+              { texte: "1000-2000 درهم", description: "جودة ممتازة" },
+              { texte: "أكثر من 2000 درهم", description: "الفاخرة والمطرزة" }
             ]
           }
         ]
@@ -119,7 +112,7 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// ✅ Recevoir les messages
+// ✅ Recevoir les messages WhatsApp
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 
@@ -134,24 +127,27 @@ app.post('/webhook', async (req, res) => {
     const from = msg.from;
 
     let texteRecu = '';
-    let session = sessions.get(from) || { etat: 'debut', questions: [] };
+    let optionChoisie = null;
+    let session = sessions.get(from) || {
+      etat: 'debut',
+      etapeActuelle: 0,
+      choix: []
+    };
 
     if (msg.type === 'text') {
       texteRecu = msg.text?.body?.trim();
-
       if (session.etat === 'attente_choix') {
-        console.log('⏭️ Message ignoré (clic sur la liste):', texteRecu);
+        console.log('⏭️ Message ignoré:', texteRecu);
         return;
       }
-
     } else if (msg.type === 'interactive') {
       if (msg.interactive?.list_reply) {
-        const index = parseInt(msg.interactive.list_reply.id.replace('q_', ''));
-        texteRecu = (index + 1).toString();
-        console.log(`👆 Liste cliquée: ${msg.interactive.list_reply.title}`);
+        texteRecu = msg.interactive.list_reply.id;
+        optionChoisie = msg.interactive.list_reply.title;
+        console.log(`👆 Option: ${optionChoisie}`);
       } else if (msg.interactive?.button_reply) {
         texteRecu = msg.interactive.button_reply.id;
-        console.log(`👆 Bouton cliqué: ${msg.interactive.button_reply.title}`);
+        console.log(`👆 Bouton: ${texteRecu}`);
       }
     }
 
@@ -159,38 +155,52 @@ app.post('/webhook', async (req, res) => {
 
     console.log(`📩 De ${from}: ${texteRecu}`);
 
-    // ✅ Chercher l'entreprise par numéro WhatsApp du destinataire
     let entreprise = await Entreprise.findOne({ actif: true });
     if (!entreprise) return;
 
-    const motsMenu = ['0', 'menu', 'مرحبا', 'سلام', 'bonjour',
-                      'hi', 'hello', 'back_menu', 'السلام'];
+    const etapes = [...entreprise.etapes].sort((a, b) => a.ordre - b.ordre);
+    const motsMenu = ['0', 'menu', 'مرحبا', 'سلام', 'bonjour', 'hi', 'hello', 'السلام', 'restart'];
 
+    // ── DÉMARRER
     if (session.etat === 'debut' || motsMenu.includes(texteRecu.toLowerCase())) {
-      session.questions = [];
-      entreprise.sections.forEach(section => {
-        section.questions.forEach(q => session.questions.push(q));
-      });
-      await envoyerMenu(from, entreprise, session.questions);
-      session.etat = 'attente_choix';
-
-    } else if (session.etat === 'attente_choix') {
-      const choix = parseInt(texteRecu);
-
-      if (choix && choix > 0 && choix <= session.questions.length) {
-        const q = session.questions[choix - 1];
-
-        if (q.audioUrl && q.audioUrl.trim() !== '') {
-          await envoyerAudio(from, q.audioUrl, q.question, q.reponse);
-        } else {
-          await envoyerReponse(from, q);
-        }
-
+      session = { etat: 'attente_choix', etapeActuelle: 0, choix: [] };
+      sessions.set(from, session);
+      await envoyerMessage(from, `*${entreprise.salutation}*`);
+      await new Promise(r => setTimeout(r, 500));
+      if (etapes.length > 0) {
+        await envoyerEtape(from, etapes[0], etapes.length);
       } else {
-        await envoyerMessage(from,
-          `❌ اختيار غير صحيح\nاكتب رقم بين 1 و ${session.questions.length}\nأو اكتب 0 للقائمة`
-        );
+        await envoyerMessage(from, 'لا توجد خطوات متاحة حالياً.');
       }
+
+    // ── TRAITER CHOIX
+    } else if (session.etat === 'attente_choix' && optionChoisie) {
+      const etapeIndex = session.etapeActuelle;
+      const etape = etapes[etapeIndex];
+
+      session.choix.push({
+        etape: etape.titre,
+        reponse: optionChoisie
+      });
+
+      if (etapeIndex + 1 >= etapes.length) {
+        // ✅ RÉCAPITULATIF FINAL
+        await envoyerRecap(from, entreprise, session.choix);
+        session.etat = 'termine';
+      } else {
+        // ✅ ÉTAPE SUIVANTE
+        session.etapeActuelle = etapeIndex + 1;
+        await envoyerMessage(from, `✅ *اخترت :* ${optionChoisie}`);
+        await new Promise(r => setTimeout(r, 600));
+        await envoyerEtape(from, etapes[session.etapeActuelle], etapes.length);
+      }
+
+    // ── RECOMMENCER
+    } else if (session.etat === 'termine' && texteRecu === 'restart_quiz') {
+      session = { etat: 'attente_choix', etapeActuelle: 0, choix: [] };
+      await envoyerMessage(from, `*${entreprise.salutation}*`);
+      await new Promise(r => setTimeout(r, 500));
+      await envoyerEtape(from, etapes[0], etapes.length);
     }
 
     sessions.set(from, session);
@@ -200,17 +210,19 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// ✅ Envoyer menu interactif avec descriptions
-async function envoyerMenu(to, entreprise, questions) {
+// ✅ Envoyer une étape
+async function envoyerEtape(to, etape, totalEtapes) {
   try {
-    const sections = entreprise.sections.map(section => ({
-      title: section.titre.substring(0, 24),
-      rows: section.questions.map(q => ({
-        id: `q_${questions.indexOf(q)}`,
-        title: q.question.substring(0, 24),
-        description: (q.description || q.reponse).substring(0, 72)
-      }))
+    const rows = (etape.options || []).map((opt, i) => ({
+      id: `opt_${etape.ordre}_${i}`,
+      title: opt.texte.substring(0, 24),
+      description: (opt.description || '').substring(0, 72)
     }));
+
+    if (rows.length === 0) {
+      await envoyerMessage(to, `⚠️ لا توجد خيارات في هذه الخطوة`);
+      return;
+    }
 
     await axios.post(
       `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
@@ -220,45 +232,17 @@ async function envoyerMenu(to, entreprise, questions) {
         type: 'interactive',
         interactive: {
           type: 'list',
-          header: { type: 'text', text: `🤖 ${entreprise.nom}` },
-          body: { text: entreprise.salutation },
-          footer: { text: 'اختر سؤالك من القائمة 👇' },
+          header: {
+            type: 'text',
+            text: `📋 الخطوة ${etape.ordre} من ${totalEtapes}`
+          },
+          body: { text: etape.question },
+          footer: { text: 'اختر من القائمة 👇' },
           action: {
-            button: '📋 الأسئلة الشائعة',
-            sections: sections
-          }
-        }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    console.log(`✅ Menu envoyé à ${to}`);
-  } catch (err) {
-    console.error('❌ Erreur menu:', err.response?.data || err.message);
-    await envoyerMenuTexte(to, entreprise, questions);
-  }
-}
-
-// ✅ Envoyer réponse texte avec bouton retour
-async function envoyerReponse(to, q) {
-  try {
-    await axios.post(
-      `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
-      {
-        messaging_product: 'whatsapp',
-        to: to,
-        type: 'interactive',
-        interactive: {
-          type: 'button',
-          body: { text: `*${q.question}*\n\n💬 ${q.reponse}` },
-          action: {
-            buttons: [{
-              type: 'reply',
-              reply: { id: 'back_menu', title: '🔙 الرجوع للقائمة' }
+            button: `📌 ${etape.titre}`,
+            sections: [{
+              title: etape.titre,
+              rows: rows
             }]
           }
         }
@@ -270,88 +254,67 @@ async function envoyerReponse(to, q) {
         }
       }
     );
+    console.log(`✅ Étape ${etape.ordre} envoyée`);
   } catch (err) {
-    await envoyerMessage(to,
-      `*${q.question}*\n\n💬 ${q.reponse}\n\n_اكتب 0 للقائمة_ 👇`
-    );
-  }
-}
-
-// ✅ Envoyer réponse AUDIO
-async function envoyerAudio(to, audioUrl, question, reponse) {
-  try {
-    await envoyerMessage(to, `*${question}*`);
-    await new Promise(r => setTimeout(r, 500));
-
-    await axios.post(
-      `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
-      {
-        messaging_product: 'whatsapp',
-        to: to,
-        type: 'audio',
-        audio: { link: audioUrl }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    await new Promise(r => setTimeout(r, 500));
-
-    await axios.post(
-      `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
-      {
-        messaging_product: 'whatsapp',
-        to: to,
-        type: 'interactive',
-        interactive: {
-          type: 'button',
-          body: { text: `💬 ${reponse}` },
-          action: {
-            buttons: [{
-              type: 'reply',
-              reply: { id: 'back_menu', title: '🔙 الرجوع للقائمة' }
-            }]
-          }
-        }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    console.log(`✅ Audio envoyé à ${to}`);
-  } catch (err) {
-    console.error('❌ Erreur audio:', err.response?.data || err.message);
-    await envoyerReponse(to, { question, reponse });
-  }
-}
-
-// ✅ Menu texte backup
-async function envoyerMenuTexte(to, entreprise, questions) {
-  let menu = `*${entreprise.salutation}*\n\n`;
-  menu += `🤖 *FAQ — ${entreprise.nom}*\n━━━━━━━━━━━━━━━\n\n`;
-  let numero = 1;
-  entreprise.sections.forEach(section => {
-    menu += `📌 *${section.titre}*\n`;
-    section.questions.forEach(q => {
-      menu += `${numero}. ${q.question}\n`;
-      if (q.description) menu += `   📝 ${q.description}\n`;
-      numero++;
+    console.error('❌ Erreur étape:', err.response?.data || err.message);
+    let menu = `*${etape.question}*\n\n`;
+    (etape.options || []).forEach((opt, i) => {
+      menu += `${i + 1}. ${opt.texte}\n`;
     });
-    menu += '\n';
-  });
-  menu += `━━━━━━━━━━━━━━━\n_اكتب رقم سؤالك_ 👇`;
-  await envoyerMessage(to, menu);
+    await envoyerMessage(to, menu);
+  }
 }
 
-// ✅ Envoyer message texte simple
+// ✅ Envoyer récapitulatif
+async function envoyerRecap(to, entreprise, choix) {
+  try {
+    let recap = `🎉 *شكراً على اختياراتك !*\n\n`;
+    recap += `📋 *ملخص اختياراتك :*\n`;
+    recap += `━━━━━━━━━━━━━━━\n\n`;
+    choix.forEach((c, i) => {
+      recap += `*${i + 1}. ${c.etape}*\n`;
+      recap += `   ✅ ${c.reponse}\n\n`;
+    });
+    recap += `━━━━━━━━━━━━━━━\n`;
+    recap += `💬 ${entreprise.messageRecap}`;
+
+    await axios.post(
+      `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
+      {
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'interactive',
+        interactive: {
+          type: 'button',
+          body: { text: recap },
+          action: {
+            buttons: [{
+              type: 'reply',
+              reply: { id: 'restart_quiz', title: '🔄 البدء من جديد' }
+            }]
+          }
+        }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    console.log(`✅ Récap envoyé`);
+  } catch (err) {
+    console.error('❌ Erreur recap:', err.response?.data || err.message);
+    let recap = `🎉 *ملخص اختياراتك :*\n━━━━━━━━━━━━━━━\n\n`;
+    choix.forEach((c, i) => {
+      recap += `${i + 1}. *${c.etape}* : ${c.reponse}\n`;
+    });
+    recap += `\n💬 ${entreprise.messageRecap}`;
+    await envoyerMessage(to, recap);
+  }
+}
+
+// ✅ Envoyer message texte
 async function envoyerMessage(to, texte) {
   try {
     await axios.post(
@@ -374,34 +337,123 @@ async function envoyerMessage(to, texte) {
   }
 }
 
-// ✅ API Admin
-app.get('/api/entreprises', async (req, res) => {
-  try { res.json(await Entreprise.find()); }
-  catch (err) { res.json({ error: err.message }); }
+// ✅ Middleware Admin
+const isAdmin = (req, res, next) => {
+  if (req.headers['x-admin-key'] !== process.env.ADMIN_KEY) {
+    return res.status(403).json({ error: 'غير مصرح' });
+  }
+  next();
+};
+
+// ✅ API Auth
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { numeroWhatsApp, motdepasse } = req.body;
+    const entreprise = await Entreprise.findOne({ numeroWhatsApp, motdepasse });
+    if (!entreprise) return res.status(401).json({ error: 'رقم أو كلمة مرور غير صحيحة' });
+    res.json({ message: '✅ تم تسجيل الدخول !', entreprise });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/entreprises', async (req, res) => {
+// ✅ GET toutes les entreprises (admin)
+app.get('/api/entreprises', isAdmin, async (req, res) => {
+  try {
+    res.json(await Entreprise.find());
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
+// ✅ POST ajouter entreprise (admin)
+app.post('/api/entreprises', isAdmin, async (req, res) => {
   try {
     const e = new Entreprise(req.body);
     await e.save();
     res.json({ message: '✅ Ajouté !', data: e });
-  } catch (err) { res.json({ error: err.message }); }
+  } catch (err) {
+    res.json({ error: err.message });
+  }
 });
 
+// ✅ PUT modifier entreprise — FIX PRINCIPAL
 app.put('/api/entreprises/:id', async (req, res) => {
   try {
-    const e = await Entreprise.findByIdAndUpdate(
-      req.params.id, req.body, { new: true }
-    );
-    res.json({ message: '✅ Modifié !', data: e });
-  } catch (err) { res.json({ error: err.message }); }
+    const adminKey       = req.headers['x-admin-key'];
+    const clientNumero   = req.headers['x-client-numero'];
+    const clientPassword = req.headers['x-client-password'];
+
+    let entreprise = null;
+
+    // Vérifier Admin
+    if (adminKey === process.env.ADMIN_KEY) {
+      entreprise = await Entreprise.findById(req.params.id);
+    }
+    // Vérifier Client
+    else if (clientNumero && clientPassword) {
+      entreprise = await Entreprise.findOne({
+        _id: req.params.id,
+        numeroWhatsApp: clientNumero,
+        motdepasse: clientPassword
+      });
+    }
+
+    if (!entreprise) {
+      return res.status(403).json({ error: 'غير مصرح أو غير موجود' });
+    }
+
+    // ✅ FIX: Mettre à jour chaque champ manuellement
+    if (req.body.nom !== undefined) entreprise.nom = req.body.nom;
+    if (req.body.numeroWhatsApp !== undefined) entreprise.numeroWhatsApp = req.body.numeroWhatsApp;
+    if (req.body.motdepasse !== undefined) entreprise.motdepasse = req.body.motdepasse;
+    if (req.body.salutation !== undefined) entreprise.salutation = req.body.salutation;
+    if (req.body.messageRecap !== undefined) entreprise.messageRecap = req.body.messageRecap;
+    if (req.body.actif !== undefined) entreprise.actif = req.body.actif;
+
+    // ✅ FIX PRINCIPAL: Sauvegarder les étapes correctement
+    if (req.body.etapes !== undefined) {
+      entreprise.etapes = req.body.etapes;
+    }
+
+    // ✅ Marquer etapes comme modifié (important pour Mongoose)
+    entreprise.markModified('etapes');
+
+    // ✅ Sauvegarder avec save() au lieu de findByIdAndUpdate
+    await entreprise.save();
+
+    console.log('✅ Entreprise sauvegardée:', entreprise.nom, '| Étapes:', entreprise.etapes.length);
+
+    res.json({ message: '✅ Modifié !', data: entreprise });
+
+  } catch (err) {
+    console.error('❌ Erreur PUT:', err.message);
+    res.json({ error: err.message });
+  }
 });
 
-app.delete('/api/entreprises/:id', async (req, res) => {
+// ✅ DELETE supprimer entreprise (admin)
+app.delete('/api/entreprises/:id', isAdmin, async (req, res) => {
   try {
     await Entreprise.findByIdAndDelete(req.params.id);
     res.json({ message: '✅ Supprimé !' });
-  } catch (err) { res.json({ error: err.message }); }
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
+// ✅ Route de test pour vérifier les étapes
+app.get('/api/test/:id', isAdmin, async (req, res) => {
+  try {
+    const e = await Entreprise.findById(req.params.id);
+    res.json({
+      nom: e.nom,
+      etapesCount: e.etapes.length,
+      etapes: e.etapes
+    });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
 });
 
 // ✅ Démarrer serveur
