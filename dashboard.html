@@ -5,186 +5,188 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Bot WhatsApp</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  :root {
-    --green:#25D366; --green-dark:#1ebe5a; --green-light:#e8f5e9;
-    --red:#ef5350; --blue:#1976D2; --orange:#FB8C00; --purple:#7B1FA2;
-    --gray-bg:#f0f2f5;
-    --shadow:0 2px 12px rgba(0,0,0,0.08);
-    --radius:12px; --radius-sm:8px;
-  }
-  body { font-family:'Segoe UI',Arial,sans-serif; background:var(--gray-bg); min-height:100vh; }
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --green:#25D366; --gd:#1ebe5a; --gl:#e8f5e9;
+  --red:#ef5350; --blue:#1976D2; --orange:#FB8C00; --purple:#7B1FA2;
+  --bg:#f0f2f5; --shadow:0 2px 12px rgba(0,0,0,0.08);
+  --r:12px; --rs:8px;
+}
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); }
 
-  #login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460); }
-  .login-box { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; }
-  .login-logo { font-size:48px; margin-bottom:10px; }
-  .login-title { font-size:22px; font-weight:700; color:#1a1a2e; margin-bottom:5px; }
-  .login-subtitle { color:#888; font-size:13px; margin-bottom:30px; }
-  .login-input { width:100%; padding:13px 16px; border:2px solid #e0e0e0; border-radius:var(--radius-sm); font-size:15px; margin-bottom:15px; text-align:right; font-family:inherit; }
-  .login-input:focus { outline:none; border-color:var(--green); }
-  .login-btn { width:100%; padding:13px; background:var(--green); color:white; border:none; border-radius:var(--radius-sm); font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; }
-  .login-btn:hover { background:var(--green-dark); }
-  .login-error { background:#ffebee; color:var(--red); padding:10px; border-radius:var(--radius-sm); margin-top:12px; font-size:13px; display:none; }
+/* LOGIN */
+#LP { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1a1a2e,#0f3460); }
+.lbox { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.lbox h1 { font-size:22px; font-weight:700; color:#1a1a2e; margin:10px 0 4px; }
+.lbox p  { color:#888; font-size:13px; margin-bottom:28px; }
+.li { width:100%; padding:13px; border:2px solid #e0e0e0; border-radius:var(--rs); font-size:15px; margin-bottom:14px; text-align:right; font-family:inherit; }
+.li:focus { outline:none; border-color:var(--green); }
+.lb { width:100%; padding:13px; background:var(--green); color:white; border:none; border-radius:var(--rs); font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; }
+.lb:hover { background:var(--gd); }
+.lerr { background:#ffebee; color:var(--red); padding:10px; border-radius:var(--rs); margin-top:12px; font-size:13px; display:none; }
 
-  #app-page { display:none; }
-  .header { background:linear-gradient(135deg,var(--green),#1ebe5a); color:white; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(37,211,102,0.3); }
-  .header-title { font-size:18px; font-weight:700; }
-  .header-subtitle { font-size:12px; opacity:0.85; }
-  .user-badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.2); padding:8px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
-  .user-badge:hover { background:rgba(255,255,255,0.3); }
-  .role-chip { background:rgba(255,255,255,0.9); color:var(--green-dark); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
-  .role-chip.admin { color:#d32f2f; }
-  .container { max-width:960px; margin:0 auto; padding:24px 16px; }
+/* APP */
+#AP { display:none; }
+.hdr { background:linear-gradient(135deg,var(--green),var(--gd)); color:white; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(37,211,102,0.3); }
+.htitle { font-size:18px; font-weight:700; }
+.hsub   { font-size:12px; opacity:0.85; }
+.ubadge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.2); padding:8px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
+.ubadge:hover { background:rgba(255,255,255,0.3); }
+.rchip { background:rgba(255,255,255,0.9); color:var(--gd); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.rchip.admin { color:#d32f2f; }
+.wrap { max-width:960px; margin:0 auto; padding:24px 16px; }
 
-  .card { background:white; border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:var(--shadow); }
-  .card-title { font-size:16px; font-weight:700; color:#1a1a1a; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
-  .card-title-dot { width:4px; height:18px; background:var(--green); border-radius:2px; }
+/* CARDS */
+.card { background:white; border-radius:var(--r); padding:24px; margin-bottom:20px; box-shadow:var(--shadow); }
+.ctitle { font-size:16px; font-weight:700; color:#1a1a1a; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+.cdot { width:4px; height:18px; background:var(--green); border-radius:2px; }
 
-  .form-group { margin-bottom:12px; }
-  .form-group label { display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:5px; }
-  input[type=text], input[type=password], input[type=number], textarea {
-    width:100%; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--radius-sm);
-    font-size:14px; font-family:inherit; background:#fafafa; transition:border 0.2s;
-  }
-  input:focus, textarea:focus { outline:none; border-color:var(--purple); background:white; }
-  textarea { height:70px; resize:vertical; }
+/* FORM */
+.fg { margin-bottom:12px; }
+.fg label { display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:5px; }
+input[type=text], input[type=password], input[type=number], textarea {
+  width:100%; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--rs);
+  font-size:14px; font-family:inherit; background:#fafafa;
+}
+input:focus, textarea:focus { outline:none; border-color:var(--purple); background:white; }
+textarea { height:70px; resize:vertical; }
 
-  .btn { padding:9px 18px; border:none; border-radius:var(--radius-sm); cursor:pointer; font-size:13px; font-weight:600; font-family:inherit; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
-  .btn:hover { transform:translateY(-1px); opacity:0.9; }
-  .btn:active { transform:translateY(0); }
-  .btn-green  { background:var(--green);  color:white; }
-  .btn-red    { background:var(--red);    color:white; }
-  .btn-blue   { background:var(--blue);   color:white; }
-  .btn-orange { background:var(--orange); color:white; }
-  .btn-purple { background:var(--purple); color:white; }
-  .btn-sm { padding:5px 12px; font-size:12px; }
+/* BUTTONS */
+.btn { padding:9px 18px; border:none; border-radius:var(--rs); cursor:pointer; font-size:13px; font-weight:600; font-family:inherit; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
+.btn:hover { transform:translateY(-1px); opacity:0.9; }
+.bg  { background:var(--green);  color:white; }
+.br  { background:var(--red);    color:white; }
+.bb  { background:var(--blue);   color:white; }
+.bo  { background:var(--orange); color:white; }
+.bp  { background:var(--purple); color:white; }
+.sm  { padding:5px 12px; font-size:12px; }
 
-  .entreprise-card { border:1.5px solid #e8e8e8; border-radius:var(--radius); margin-bottom:16px; overflow:hidden; }
-  .entreprise-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:linear-gradient(to left,#f8fffe,#f0faf5); border-bottom:1px solid #e8e8e8; flex-wrap:wrap; gap:10px; }
-  .entreprise-info h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
-  .entreprise-info p { font-size:13px; color:#666; margin-top:2px; }
-  .entreprise-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .status-active   { background:#e8f5e9; color:#2e7d32; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
-  .status-inactive { background:#ffebee; color:#c62828; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
-  .entreprise-body { padding:20px; }
+/* ENTREPRISE */
+.ecard { border:1.5px solid #e8e8e8; border-radius:var(--r); margin-bottom:16px; overflow:hidden; }
+.ehdr  { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:linear-gradient(to left,#f8fffe,#f0faf5); border-bottom:1px solid #e8e8e8; flex-wrap:wrap; gap:10px; }
+.einfo h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
+.einfo p  { font-size:13px; color:#666; margin-top:2px; }
+.eact { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.sa { background:#e8f5e9; color:#2e7d32; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+.si { background:#ffebee; color:#c62828; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+.ebody { padding:20px; }
 
-  .etape-card { border:2px solid var(--purple); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
-  .etape-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:linear-gradient(to left,#f3e5f5,#ede7f6); border-bottom:1px solid #ce93d8; gap:12px; }
-  .etape-num { width:34px; height:34px; background:var(--purple); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
-  .etape-info { flex:1; }
-  .etape-titre { font-size:15px; font-weight:700; color:#4a148c; }
-  .etape-question { font-size:12px; color:#777; margin-top:2px; }
-  .etape-body { padding:14px 16px; background:white; }
+/* ÉTAPE */
+.etcard { border:2px solid var(--purple); border-radius:var(--r); margin-bottom:14px; overflow:hidden; }
+.ethdr  { display:flex; align-items:center; gap:12px; padding:12px 16px; background:linear-gradient(to left,#f3e5f5,#ede7f6); border-bottom:1px solid #ce93d8; }
+.etnum  { width:34px; height:34px; background:var(--purple); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
+.etinfo { flex:1; }
+.etq    { font-size:14px; font-weight:700; color:#4a148c; }
+.etbody { padding:14px 16px; background:white; }
 
-  .option-card { display:flex; align-items:center; justify-content:space-between; background:#f3e5f5; border:1px solid #ce93d8; border-right:4px solid var(--purple); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:8px; gap:10px; }
-  .option-texte { font-weight:600; font-size:14px; }
-  .option-desc  { font-size:12px; color:#888; margin-top:2px; }
+/* OPTION */
+.ocard { display:flex; align-items:center; justify-content:space-between; background:#f3e5f5; border:1px solid #ce93d8; border-right:4px solid var(--purple); border-radius:var(--rs); padding:10px 14px; margin-bottom:8px; }
+.otxt  { font-weight:600; font-size:14px; }
 
-  .add-zone { background:#fafafa; border:1.5px dashed #ccc; border-radius:var(--radius-sm); padding:14px; margin-top:10px; }
-  .add-zone-title { font-size:13px; font-weight:700; margin-bottom:10px; }
-  .add-etape-zone { background:#f3e5f5; border:2px dashed #ce93d8; border-radius:var(--radius-sm); padding:16px; margin-top:16px; }
+/* ZONES */
+.azone  { background:#fafafa; border:1.5px dashed #ccc; border-radius:var(--rs); padding:14px; margin-top:10px; }
+.aetzone { background:#f3e5f5; border:2px dashed #ce93d8; border-radius:var(--rs); padding:16px; margin-top:16px; }
+.aztitle { font-size:13px; font-weight:700; margin-bottom:10px; }
 
-  .flow-bar { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:var(--radius-sm); padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+/* FLOW */
+.flow { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:var(--rs); padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
 
-  .admin-selector { background:linear-gradient(135deg,#fff3e0,#fff8e1); border:2px solid var(--orange); border-radius:var(--radius); padding:16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-  .admin-selector label { font-weight:700; color:#e65100; font-size:14px; white-space:nowrap; }
-  .admin-selector select { margin:0; max-width:300px; width:auto; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--radius-sm); font-size:14px; font-family:inherit; background:#fafafa; }
+/* ADMIN BAR */
+.abar { background:linear-gradient(135deg,#fff3e0,#fff8e1); border:2px solid var(--orange); border-radius:var(--r); padding:16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.abar label { font-weight:700; color:#e65100; font-size:14px; white-space:nowrap; }
+.abar select { margin:0; max-width:300px; width:auto; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--rs); font-size:14px; font-family:inherit; background:#fafafa; }
 
-  .tabs { display:flex; border-bottom:2px solid #e0e0e0; margin-bottom:20px; }
-  .tab { padding:10px 20px; font-size:14px; font-weight:600; color:#888; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
-  .tab.active { color:var(--green); border-bottom-color:var(--green); }
+/* TABS */
+.tabs { display:flex; border-bottom:2px solid #e0e0e0; margin-bottom:20px; }
+.tab  { padding:10px 20px; font-size:14px; font-weight:600; color:#888; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; }
+.tab.active { color:var(--green); border-bottom-color:var(--green); }
 
-  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:#323232; color:white; padding:12px 24px; border-radius:24px; font-size:14px; z-index:9999; transition:transform 0.3s; white-space:nowrap; pointer-events:none; }
-  .toast.show { transform:translateX(-50%) translateY(0); }
-  .toast.success { background:#2e7d32; }
-  .toast.error   { background:#c62828; }
-  .toast.info    { background:#1565C0; }
+/* TOAST */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:#323232; color:white; padding:12px 24px; border-radius:24px; font-size:14px; z-index:9999; transition:transform 0.3s; pointer-events:none; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok   { background:#2e7d32; }
+.toast.err  { background:#c62828; }
+.toast.info { background:#1565C0; }
 
-  .loading { text-align:center; padding:30px; color:#aaa; }
-  .spinner { display:inline-block; width:24px; height:24px; border:3px solid #e0e0e0; border-top-color:var(--green); border-radius:50%; animation:spin 0.8s linear infinite; }
-  @keyframes spin { to { transform:rotate(360deg); } }
+.spin { display:inline-block; width:22px; height:22px; border:3px solid #e0e0e0; border-top-color:var(--green); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading { text-align:center; padding:30px; color:#aaa; }
 
-  .grid-2 { display:grid; grid-template-columns:120px 1fr; gap:10px; }
-
-  @media (max-width:600px) {
-    .header { padding:0 14px; }
-    .container { padding:14px 10px; }
-    .entreprise-header, .admin-selector { flex-direction:column; }
-    .grid-2 { grid-template-columns:1fr; }
-  }
+@media(max-width:600px) {
+  .hdr,.wrap { padding-left:14px; padding-right:14px; }
+  .ehdr,.abar { flex-direction:column; }
+}
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══ -->
-<div id="login-page">
-  <div class="login-box">
-    <div class="login-logo">🤖</div>
-    <div class="login-title">Dashboard WhatsApp Bot</div>
-    <div class="login-subtitle">نظام الاستبيان متعدد الخطوات</div>
-    <input class="login-input" type="text"     id="login-numero"   placeholder="رقم WhatsApp">
-    <input class="login-input" type="password" id="login-password" placeholder="كلمة المرور">
-    <button class="login-btn" onclick="login()">🔐 تسجيل الدخول</button>
-    <div class="login-error" id="login-error"></div>
+<!-- LOGIN -->
+<div id="LP">
+  <div class="lbox">
+    <div style="font-size:48px">🤖</div>
+    <h1>Dashboard WhatsApp Bot</h1>
+    <p>سجّل دخولك للوصول إلى لوحة التحكم</p>
+    <input class="li" type="text"     id="lnum" placeholder="رقم WhatsApp">
+    <input class="li" type="password" id="lpwd" placeholder="كلمة المرور">
+    <button class="lb" onclick="login()">🔐 تسجيل الدخول</button>
+    <div class="lerr" id="lerr"></div>
   </div>
 </div>
 
-<!-- ═══ APP ═══ -->
-<div id="app-page">
-  <header class="header">
+<!-- APP -->
+<div id="AP">
+  <header class="hdr">
     <div style="display:flex;align-items:center;gap:12px">
       <span style="font-size:24px">🤖</span>
       <div>
-        <div class="header-title">Dashboard Bot WhatsApp</div>
-        <div class="header-subtitle" id="header-subtitle">لوحة التحكم</div>
+        <div class="htitle">Dashboard Bot WhatsApp</div>
+        <div class="hsub" id="hsub">لوحة التحكم</div>
       </div>
     </div>
-    <div class="user-badge" onclick="logout()">
-      <span id="header-username"></span>
-      <span class="role-chip" id="header-role-chip">CLIENT</span>
+    <div class="ubadge" onclick="logout()">
+      <span id="huname"></span>
+      <span class="rchip" id="hrole">CLIENT</span>
       <span>🚪</span>
     </div>
   </header>
 
-  <div class="container">
+  <div class="wrap">
 
-    <div class="tabs" id="admin-tabs" style="display:none">
-      <div class="tab active" onclick="switchTab('entreprises')">🏢 الشركات</div>
-      <div class="tab" onclick="switchTab('users')">👥 المستخدمين</div>
+    <div class="tabs" id="atabs" style="display:none">
+      <div class="tab active" onclick="switchTab('e')">🏢 الشركات</div>
+      <div class="tab" onclick="switchTab('u')">👥 المستخدمين</div>
     </div>
 
-    <div id="tab-entreprises">
-
-      <div class="admin-selector" id="admin-selector" style="display:none">
+    <!-- TAB ENTREPRISES -->
+    <div id="te">
+      <div class="abar" id="abar" style="display:none">
         <label>🔧 وضع المدير :</label>
-        <select id="admin-select" onchange="adminSelect()">
-          <option value="">— عرض الكل —</option>
-        </select>
-        <button class="btn btn-green btn-sm" onclick="showAddForm()">➕ شركة جديدة</button>
+        <select id="asel" onchange="aselChange()"><option value="">— عرض الكل —</option></select>
+        <button class="btn bg sm" onclick="showAF()">➕ شركة جديدة</button>
       </div>
 
-      <div class="card" id="add-card" style="display:none">
-        <div class="card-title"><div class="card-title-dot"></div>➕ إضافة شركة جديدة</div>
-        <div class="form-group"><label>اسم الشركة</label><input type="text" id="new-nom" placeholder="Boutique Moda"></div>
-        <div class="form-group"><label>رقم WhatsApp</label><input type="text" id="new-numero" placeholder="212612838772"></div>
-        <div class="form-group"><label>كلمة مرور العميل</label><input type="text" id="new-password" placeholder="boutique123"></div>
-        <div class="form-group"><label>رسالة الترحيب</label><textarea id="new-salutation" placeholder="مرحبا بك ! 👋"></textarea></div>
-        <div class="form-group"><label>رسالة الخاتمة</label><textarea id="new-recap" placeholder="شكراً ! سنتواصل معك قريباً 😊"></textarea></div>
-        <button class="btn btn-green" onclick="ajouterEntreprise()">✅ إضافة</button>
-        <button class="btn btn-red" onclick="hideAddForm()" style="margin-right:8px">❌ إلغاء</button>
+      <div class="card" id="AF" style="display:none">
+        <div class="ctitle"><div class="cdot"></div>➕ إضافة شركة جديدة</div>
+        <div class="fg"><label>اسم الشركة</label><input type="text" id="fn" placeholder="Boutique Moda"></div>
+        <div class="fg"><label>رقم WhatsApp</label><input type="text" id="fnum" placeholder="212612838772"></div>
+        <div class="fg"><label>كلمة مرور العميل</label><input type="text" id="fpwd" placeholder="boutique123"></div>
+        <div class="fg"><label>رسالة الترحيب</label><textarea id="fsal" placeholder="مرحبا بك ! 👋"></textarea></div>
+        <div class="fg"><label>رسالة الخاتمة (تظهر في ملخص الطلب)</label><textarea id="frec" placeholder="شكراً ! سنتواصل معك قريباً 😊"></textarea></div>
+        <button class="btn bg" onclick="addE()">✅ إضافة</button>
+        <button class="btn br" onclick="hideAF()" style="margin-right:8px">❌ إلغاء</button>
       </div>
 
       <div class="card">
-        <div class="card-title"><div class="card-title-dot"></div>🏢 الشركات والاستبيانات</div>
-        <div id="liste-entreprises"><div class="loading"><span class="spinner"></span></div></div>
+        <div class="ctitle"><div class="cdot"></div>🏢 الشركات والاستبيانات</div>
+        <div id="elist"><div class="loading"><span class="spin"></span></div></div>
       </div>
-
     </div>
 
-    <div id="tab-users" style="display:none">
+    <!-- TAB USERS -->
+    <div id="tu" style="display:none">
       <div class="card">
-        <div class="card-title"><div class="card-title-dot"></div>👥 المستخدمين</div>
-        <div id="liste-users"></div>
+        <div class="ctitle"><div class="cdot"></div>👥 المستخدمين</div>
+        <div id="ulist"></div>
       </div>
     </div>
 
@@ -194,456 +196,356 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════
-// CONFIG — CHANGEZ CES VALEURS
-// ═══════════════════════════════════════════
-const API          = 'https://web-production-53c34.up.railway.app';
-const ADMIN_NUMERO = '212600000000';
-const ADMIN_KEY    = 'admin@2025!';
+// ════════════════════════════════════
+// ⚙️ CONFIG — CHANGEZ ICI
+// ════════════════════════════════════
+const API   = 'https://web-production-53c34.up.railway.app';
+const ANUM  = '212600000000'; // numéro admin
+const AKEY  = 'admin@2025!';  // clé admin (même valeur que ADMIN_KEY dans Railway)
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════
-let currentUser     = null;
-let allEntreprises  = [];
-let selectedAdminId = null;
+// ════════════════════════════════════
+let me   = null;   // utilisateur connecté
+let data = [];     // toutes les entreprises
+let selId = null;  // entreprise sélectionnée (admin)
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // AUTH
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 async function login() {
-  const numero   = document.getElementById('login-numero').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  if (!numero || !password) return showLoginError('يرجى ملء جميع الحقول');
+  const num = document.getElementById('lnum').value.trim();
+  const pwd = document.getElementById('lpwd').value.trim();
+  if (!num || !pwd) return lerr('يرجى ملء جميع الحقول');
 
-  // ADMIN
-  if (numero === ADMIN_NUMERO && password === ADMIN_KEY) {
-    currentUser = { numero, role:'admin', nom:'👑 المدير', motdepasse:ADMIN_KEY };
-    startApp();
-    await chargerEntreprises();
-    return;
+  // Admin
+  if (num === ANUM && pwd === AKEY) {
+    me = { num, role:'admin', nom:'👑 المدير', pwd };
+    boot(); load(); return;
   }
 
-  // CLIENT
+  // Client
   try {
-    const res  = await fetch(`${API}/api/auth/login`, {
+    const r = await fetch(`${API}/api/auth/login`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ numeroWhatsApp:numero, motdepasse:password })
+      body: JSON.stringify({ numeroWhatsApp:num, motdepasse:pwd })
     });
-    const data = await res.json();
-    if (res.ok && data.entreprise) {
-      currentUser = { numero, role:'client', nom:data.entreprise.nom, motdepasse:password, entrepriseId:data.entreprise._id };
-      allEntreprises = [data.entreprise];
-      startApp();
-      afficherEntreprises();
-    } else {
-      showLoginError(data.error || 'رقم أو كلمة مرور غير صحيحة');
-    }
-  } catch(e) { showLoginError('خطأ في الاتصال بالخادم'); }
+    const d = await r.json();
+    if (r.ok && d.entreprise) {
+      me = { num, role:'client', nom:d.entreprise.nom, pwd, eid:d.entreprise._id };
+      data = [d.entreprise];
+      boot(); render();
+    } else lerr(d.error || 'رقم أو كلمة مرور غير صحيحة');
+  } catch { lerr('خطأ في الاتصال بالخادم'); }
 }
 
-function showLoginError(msg) {
-  const el = document.getElementById('login-error');
-  el.textContent = '❌ ' + msg; el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 3000);
+function lerr(msg) {
+  const e = document.getElementById('lerr');
+  e.textContent = '❌ ' + msg; e.style.display = 'block';
+  setTimeout(() => e.style.display = 'none', 3000);
 }
 
-function startApp() {
-  document.getElementById('login-page').style.display = 'none';
-  document.getElementById('app-page').style.display   = 'block';
-  document.getElementById('header-username').textContent = currentUser.nom;
-  const chip = document.getElementById('header-role-chip');
-  if (currentUser.role === 'admin') {
-    chip.textContent = 'ADMIN'; chip.classList.add('admin');
-    document.getElementById('admin-tabs').style.display     = 'flex';
-    document.getElementById('admin-selector').style.display = 'flex';
-    document.getElementById('header-subtitle').textContent  = 'وضع المدير — صلاحيات كاملة';
+function boot() {
+  document.getElementById('LP').style.display = 'none';
+  document.getElementById('AP').style.display = 'block';
+  document.getElementById('huname').textContent = me.nom;
+  const c = document.getElementById('hrole');
+  if (me.role === 'admin') {
+    c.textContent = 'ADMIN'; c.classList.add('admin');
+    document.getElementById('atabs').style.display = 'flex';
+    document.getElementById('abar').style.display  = 'flex';
+    document.getElementById('hsub').textContent    = 'وضع المدير — صلاحيات كاملة';
   } else {
-    chip.textContent = 'CLIENT';
-    document.getElementById('header-subtitle').textContent = currentUser.nom;
+    c.textContent = 'CLIENT';
+    document.getElementById('hsub').textContent = me.nom;
   }
 }
 
 function logout() {
   if (!confirm('تسجيل الخروج ؟')) return;
-  currentUser = null; allEntreprises = []; selectedAdminId = null;
-  document.getElementById('app-page').style.display  = 'none';
-  document.getElementById('login-page').style.display = 'flex';
-  document.getElementById('login-numero').value = '';
-  document.getElementById('login-password').value = '';
+  me = null; data = []; selId = null;
+  document.getElementById('AP').style.display = 'none';
+  document.getElementById('LP').style.display = 'flex';
+  document.getElementById('lnum').value = '';
+  document.getElementById('lpwd').value = '';
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // TABS
-// ═══════════════════════════════════════════
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===(tab==='entreprises'?0:1)));
-  document.getElementById('tab-entreprises').style.display = tab==='entreprises'?'block':'none';
-  document.getElementById('tab-users').style.display       = tab==='users'?'block':'none';
-  if (tab==='users') afficherUsers();
+// ════════════════════════════════════
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', i===(t==='e'?0:1)));
+  document.getElementById('te').style.display = t==='e'?'block':'none';
+  document.getElementById('tu').style.display = t==='u'?'block':'none';
+  if (t==='u') renderUsers();
 }
 
-// ═══════════════════════════════════════════
-// CHARGER DEPUIS SERVEUR
-// ═══════════════════════════════════════════
-async function chargerEntreprises() {
-  document.getElementById('liste-entreprises').innerHTML = '<div class="loading"><span class="spinner"></span></div>';
+// ════════════════════════════════════
+// LOAD (admin seulement)
+// ════════════════════════════════════
+async function load() {
+  document.getElementById('elist').innerHTML = '<div class="loading"><span class="spin"></span></div>';
   try {
-    const res = await fetch(`${API}/api/entreprises`, { headers:{'x-admin-key':ADMIN_KEY} });
-    allEntreprises = await res.json();
-
-    // Mettre à jour le sélecteur admin
-    const sel  = document.getElementById('admin-select');
-    const prev = sel.value;
-    sel.innerHTML = '<option value="">— عرض الكل —</option>' +
-      allEntreprises.map(e => `<option value="${e._id}">${e.nom} (${e.numeroWhatsApp})</option>`).join('');
-    if (prev) sel.value = prev;
-
-    afficherEntreprises();
-  } catch(e) {
-    document.getElementById('liste-entreprises').innerHTML = '<p style="color:red;text-align:center;padding:20px">❌ خطأ في الاتصال</p>';
+    const r = await fetch(`${API}/api/entreprises`, { headers:{'x-admin-key':AKEY} });
+    if (!r.ok) throw new Error('Erreur ' + r.status);
+    data = await r.json();
+    // Mettre à jour sélecteur
+    const s = document.getElementById('asel');
+    const p = s.value;
+    s.innerHTML = '<option value="">— عرض الكل —</option>' +
+      data.map(e=>`<option value="${e._id}">${e.nom} (${e.numeroWhatsApp})</option>`).join('');
+    if (p) s.value = p;
+    render();
+  } catch(err) {
+    document.getElementById('elist').innerHTML = `<p style="color:red;text-align:center;padding:20px">❌ خطأ في الاتصال<br><small>${err.message}</small></p>`;
   }
 }
 
-// ═══════════════════════════════════════════
-// AFFICHER
-// ═══════════════════════════════════════════
-function afficherEntreprises() {
-  const div     = document.getElementById('liste-entreprises');
-  const isAdmin = currentUser.role === 'admin';
-  const liste   = isAdmin
-    ? (selectedAdminId ? allEntreprises.filter(e=>e._id===selectedAdminId) : allEntreprises)
-    : allEntreprises;
+function aselChange() { selId = document.getElementById('asel').value; render(); }
 
-  if (!liste.length) {
-    div.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa"><p style="font-size:40px">🏢</p><p>لا توجد شركات.</p></div>';
+// ════════════════════════════════════
+// RENDER
+// ════════════════════════════════════
+function render() {
+  const el = document.getElementById('elist');
+  const list = me.role==='admin'
+    ? (selId ? data.filter(e=>e._id===selId) : data)
+    : data;
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa"><p style="font-size:40px">🏢</p><p>لا توجد شركات.</p></div>';
     return;
   }
-  div.innerHTML = liste.map(e => renderEntreprise(e)).join('');
+  el.innerHTML = list.map(e=>renderE(e)).join('');
 }
 
-function renderEntreprise(e) {
-  const isAdmin = currentUser.role === 'admin';
-  const etapes  = [...(e.etapes||[])].sort((a,b)=>a.ordre-b.ordre);
-  const eid     = e._id;
-
+function renderE(e) {
+  const isA  = me.role==='admin';
+  const ets  = [...(e.etapes||[])].sort((a,b)=>a.ordre-b.ordre);
+  const id   = e._id;
   return `
-  <div class="entreprise-card">
-    <div class="entreprise-header">
-      <div class="entreprise-info">
+  <div class="ecard">
+    <div class="ehdr">
+      <div class="einfo">
         <h3>🏢 ${e.nom}</h3>
         <p>📱 ${e.numeroWhatsApp}</p>
-        <p>👋 ${e.salutation}</p>
+        <p>👋 ${e.salutation||'—'}</p>
         <p>🏁 ${e.messageRecap||'—'}</p>
-        ${isAdmin?`<p style="color:#aaa;font-size:11px">🔑 ${e.motdepasse||'—'}</p>`:''}
+        ${isA?`<p style="color:#aaa;font-size:11px">🔑 ${e.motdepasse||'—'}</p>`:''}
       </div>
-      <div class="entreprise-actions">
-        <span class="${e.actif?'status-active':'status-inactive'}">${e.actif?'✅ نشط':'❌ متوقف'}</span>
-        ${isAdmin?`
-          <button class="btn btn-orange btn-sm" onclick="toggleActif('${eid}',${e.actif})">${e.actif?'⏸ إيقاف':'▶️ تشغيل'}</button>
-          <button class="btn btn-red btn-sm" onclick="supprimerEntreprise('${eid}')">🗑️ حذف</button>
+      <div class="eact">
+        <span class="${e.actif?'sa':'si'}">${e.actif?'✅ نشط':'❌ متوقف'}</span>
+        ${isA?`
+          <button class="btn bo sm" onclick="toggleA('${id}',${e.actif})">${e.actif?'⏸ إيقاف':'▶️ تشغيل'}</button>
+          <button class="btn br sm" onclick="delE('${id}')">🗑️ حذف</button>
         `:''}
       </div>
     </div>
+    <div class="ebody">
 
-    <div class="entreprise-body">
-
-      <!-- FLOW BAR -->
-      ${etapes.length>0?`
-        <div class="flow-bar">
-          <span style="font-size:12px;color:var(--green)">▶️ البداية</span>
-          ${etapes.map(et=>`
-            <span style="color:#555">→</span>
-            <span style="background:var(--purple);color:white;padding:3px 10px;border-radius:12px;font-size:12px">${et.titre}</span>
-          `).join('')}
+      ${ets.length?`
+        <div class="flow">
+          <span style="font-size:12px;color:var(--green)">▶️ بداية</span>
+          ${ets.map(et=>`<span style="color:#555">→</span><span style="background:var(--purple);color:white;padding:3px 10px;border-radius:12px;font-size:12px">${et.question.substring(0,20)}</span>`).join('')}
           <span style="color:#555">→</span>
-          <span style="background:var(--green);color:white;padding:3px 10px;border-radius:12px;font-size:12px">📋 الملخص</span>
+          <span style="background:var(--green);color:white;padding:3px 10px;border-radius:12px;font-size:12px">📋 ملخص</span>
         </div>
       `:''}
 
-      <p style="font-size:13px;color:#555;margin-bottom:12px;font-weight:600">📋 الخطوات والخيارات (${etapes.length}) :</p>
+      <p style="font-size:13px;color:#555;font-weight:600;margin-bottom:12px">📋 الخطوات (${ets.length}) :</p>
 
-      <!-- ÉTAPES -->
-      ${etapes.length===0
-        ?'<p style="color:#aaa;font-size:13px;margin-bottom:12px">لا توجد خطوات بعد. أضف خطوة أولى !</p>'
-        :etapes.map((et,ei)=>renderEtape(eid,et,ei)).join('')}
+      ${ets.length===0
+        ?'<p style="color:#aaa;font-size:13px;margin-bottom:12px">لا توجد خطوات بعد.</p>'
+        :ets.map((et,ei)=>renderEt(id,et,ei)).join('')}
 
-      <!-- AJOUTER ÉTAPE -->
-      <div class="add-etape-zone">
-        <div class="add-zone-title" style="color:var(--purple)">➕ إضافة خطوة جديدة :</div>
-        <div class="grid-2" style="margin-bottom:10px">
-          <div class="form-group" style="margin:0">
-            <label>رقم الترتيب</label>
-            <input type="number" id="et_ordre_${eid}" value="${etapes.length+1}" min="1">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label>عنوان الخطوة</label>
-            <input type="text" id="et_titre_${eid}" placeholder="مثال: نوع المنتج">
-          </div>
+      <div class="aetzone">
+        <div class="aztitle" style="color:var(--purple)">➕ إضافة خطوة جديدة :</div>
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;margin-bottom:10px">
+          <div class="fg" style="margin:0"><label>الترتيب</label><input type="number" id="eo_${id}" value="${ets.length+1}" min="1"></div>
+          <div class="fg" style="margin:0"><label>السؤال</label><input type="text" id="eq_${id}" placeholder="مثال: شمن موديل ختريتي ؟"></div>
         </div>
-        <div class="form-group">
-          <label>السؤال</label>
-          <input type="text" id="et_question_${eid}" placeholder="مثال: اختر نوع المنتج :">
-        </div>
-        <button class="btn btn-purple" onclick="ajouterEtape('${eid}')">➕ إضافة الخطوة</button>
+        <button class="btn bp" onclick="addEt('${id}')">➕ إضافة الخطوة</button>
       </div>
-
     </div>
   </div>`;
 }
 
-function renderEtape(eid, et, ei) {
+function renderEt(eid, et, ei) {
   const opts = et.options||[];
   return `
-  <div class="etape-card">
-    <div class="etape-header">
-      <div class="etape-num">${et.ordre}</div>
-      <div class="etape-info">
-        <div class="etape-titre">📌 ${et.titre}</div>
-        <div class="etape-question">❓ ${et.question}</div>
+  <div class="etcard">
+    <div class="ethdr">
+      <div class="etnum">${et.ordre}</div>
+      <div class="etinfo">
+        <div class="etq">❓ ${et.question}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">${opts.length} خيار</div>
       </div>
-      <button class="btn btn-red btn-sm" onclick="supprimerEtape('${eid}',${ei})">🗑️ حذف</button>
+      <button class="btn br sm" onclick="delEt('${eid}',${ei})">🗑️</button>
     </div>
-    <div class="etape-body">
-
-      <p style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">🎯 الخيارات (${opts.length}) :</p>
-
+    <div class="etbody">
+      <p style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">🎯 الخيارات :</p>
       ${opts.length===0
-        ?'<p style="color:#aaa;font-size:12px;margin-bottom:8px">لا توجد خيارات بعد. أضف خياراً !</p>'
-        :opts.map((opt,oi)=>`
-          <div class="option-card">
-            <div>
-              <div class="option-texte">✦ ${opt.texte}</div>
-              ${opt.description?`<div class="option-desc">📝 ${opt.description}</div>`:''}
-            </div>
-            <button class="btn btn-red btn-sm" onclick="supprimerOption('${eid}',${ei},${oi})">🗑️</button>
+        ?'<p style="color:#aaa;font-size:12px;margin-bottom:8px">لا توجد خيارات بعد.</p>'
+        :opts.map((o,oi)=>`
+          <div class="ocard">
+            <div class="otxt">▪️ ${o.texte}</div>
+            <button class="btn br sm" onclick="delOpt('${eid}',${ei},${oi})">🗑️</button>
           </div>`).join('')}
-
-      <div class="add-zone">
-        <div class="add-zone-title">➕ إضافة خيار :</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
-          <div class="form-group" style="margin:0">
-            <label>نص الخيار</label>
-            <input type="text" id="opt_texte_${eid}_${ei}" placeholder="مثال: قفطان">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label>الوصف (اختياري)</label>
-            <input type="text" id="opt_desc_${eid}_${ei}" placeholder="مثال: قفاطن تقليدية">
-          </div>
+      <div class="azone">
+        <div class="aztitle">➕ إضافة خيار :</div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div class="fg" style="margin:0;flex:1"><label>نص الخيار</label><input type="text" id="ot_${eid}_${ei}" placeholder="مثال: الموديل 1"></div>
+          <button class="btn bb sm" style="height:40px;flex-shrink:0" onclick="addOpt('${eid}',${ei})">➕ إضافة</button>
         </div>
-        <button class="btn btn-blue btn-sm" onclick="ajouterOption('${eid}',${ei})">➕ إضافة الخيار</button>
       </div>
-
     </div>
   </div>`;
 }
 
-// ═══════════════════════════════════════════
-// ADMIN HELPERS
-// ═══════════════════════════════════════════
-function adminSelect() { selectedAdminId = document.getElementById('admin-select').value; afficherEntreprises(); }
-function showAddForm() { document.getElementById('add-card').style.display = 'block'; document.getElementById('add-card').scrollIntoView({behavior:'smooth'}); }
-function hideAddForm() { document.getElementById('add-card').style.display = 'none'; }
-
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // CRUD ENTREPRISE
-// ═══════════════════════════════════════════
-async function ajouterEntreprise() {
-  const nom        = document.getElementById('new-nom').value.trim();
-  const numero     = document.getElementById('new-numero').value.trim();
-  const password   = document.getElementById('new-password').value.trim();
-  const salutation = document.getElementById('new-salutation').value.trim();
-  const recap      = document.getElementById('new-recap').value.trim();
-  if (!nom||!numero||!password||!salutation) return showToast('❌ يرجى ملء جميع الحقول','error');
+// ════════════════════════════════════
+function showAF() { document.getElementById('AF').style.display='block'; document.getElementById('AF').scrollIntoView({behavior:'smooth'}); }
+function hideAF() { document.getElementById('AF').style.display='none'; }
 
-  showToast('⏳ جاري الإضافة...','info');
-  await fetch(`${API}/api/entreprises`, {
-    method:'POST', headers:{'Content-Type':'application/json','x-admin-key':ADMIN_KEY},
-    body: JSON.stringify({ nom, numeroWhatsApp:numero, motdepasse:password, salutation, messageRecap:recap, etapes:[], actif:true })
+async function addE() {
+  const n = document.getElementById('fn').value.trim();
+  const u = document.getElementById('fnum').value.trim();
+  const p = document.getElementById('fpwd').value.trim();
+  const s = document.getElementById('fsal').value.trim();
+  const r = document.getElementById('frec').value.trim();
+  if (!n||!u||!p||!s) return toast('❌ يرجى ملء جميع الحقول','err');
+  toast('⏳ جاري الإضافة...','info');
+  const res = await fetch(`${API}/api/entreprises`,{
+    method:'POST',headers:{'Content-Type':'application/json','x-admin-key':AKEY},
+    body:JSON.stringify({nom:n,numeroWhatsApp:u,motdepasse:p,salutation:s,messageRecap:r,etapes:[],actif:true})
   });
-  ['new-nom','new-numero','new-password','new-salutation','new-recap'].forEach(id=>document.getElementById(id).value='');
-  hideAddForm();
-  showToast('✅ تمت إضافة الشركة !','success');
-  await chargerEntreprises();
+  if (!res.ok) return toast('❌ خطأ في الإضافة','err');
+  ['fn','fnum','fpwd','fsal','frec'].forEach(id=>document.getElementById(id).value='');
+  hideAF(); toast('✅ تمت الإضافة !','ok');
+  await load();
 }
 
-async function supprimerEntreprise(id) {
+async function delE(id) {
   if (!confirm('حذف هذه الشركة نهائياً ؟')) return;
-  await fetch(`${API}/api/entreprises/${id}`, { method:'DELETE', headers:{'x-admin-key':ADMIN_KEY} });
-  if (selectedAdminId===id) selectedAdminId=null;
-  showToast('🗑️ تم الحذف','success');
-  await chargerEntreprises();
+  await fetch(`${API}/api/entreprises/${id}`,{method:'DELETE',headers:{'x-admin-key':AKEY}});
+  if (selId===id) selId=null;
+  toast('🗑️ تم الحذف','ok');
+  await load();
 }
 
-async function toggleActif(id, actif) {
-  await fetch(`${API}/api/entreprises/${id}`, {
-    method:'PUT', headers:{'Content-Type':'application/json','x-admin-key':ADMIN_KEY},
-    body: JSON.stringify({ actif:!actif })
-  });
-  showToast(actif?'⏸ تم الإيقاف':'▶️ تم التشغيل','success');
-  await chargerEntreprises();
+async function toggleA(id, actif) {
+  await save(id, { actif:!actif });
+  toast(actif?'⏸ تم الإيقاف':'▶️ تم التشغيل','ok');
 }
 
-// ═══════════════════════════════════════════
-// SAVE HELPER — LE PLUS IMPORTANT
-// ═══════════════════════════════════════════
-async function saveEntreprise(id, entreprise) {
-  // Préparer les headers
-  const headers = currentUser.role === 'admin'
-    ? { 'Content-Type':'application/json', 'x-admin-key':ADMIN_KEY }
-    : { 'Content-Type':'application/json', 'x-client-numero':currentUser.numero, 'x-client-password':currentUser.motdepasse };
-
-  // Envoyer la requête
-  const res  = await fetch(`${API}/api/entreprises/${id}`, {
-    method: 'PUT',
-    headers: headers,
-    body: JSON.stringify(entreprise)
-  });
-  const data = await res.json();
-
-  if (!res.ok) {
-    console.error('❌ Erreur save:', data);
-    showToast('❌ خطأ في الحفظ: ' + (data.error||''), 'error');
-    return false;
-  }
-
-  console.log('✅ Sauvegardé:', data);
-
-  // ✅ Recharger depuis le serveur (solution définitive)
-  if (currentUser.role === 'admin') {
-    await chargerEntreprises();
-  } else {
-    // Client: re-login pour rafraîchir
-    const r = await fetch(`${API}/api/auth/login`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ numeroWhatsApp:currentUser.numero, motdepasse:currentUser.motdepasse })
-    });
-    const d = await r.json();
-    if (d.entreprise) {
-      allEntreprises = [d.entreprise];
-      afficherEntreprises();
-    }
+// ════════════════════════════════════
+// SAVE HELPER
+// ════════════════════════════════════
+async function save(id, body) {
+  const h = me.role==='admin'
+    ? {'Content-Type':'application/json','x-admin-key':AKEY}
+    : {'Content-Type':'application/json','x-client-numero':me.num,'x-client-password':me.pwd};
+  const r = await fetch(`${API}/api/entreprises/${id}`,{method:'PUT',headers:h,body:JSON.stringify(body)});
+  const d = await r.json();
+  if (!r.ok) { toast('❌ خطأ: '+(d.error||r.status),'err'); return false; }
+  // Recharger
+  if (me.role==='admin') await load();
+  else {
+    const r2 = await fetch(`${API}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({numeroWhatsApp:me.num,motdepasse:me.pwd})});
+    const d2 = await r2.json();
+    if (d2.entreprise) { data=[d2.entreprise]; render(); }
   }
   return true;
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // CRUD ÉTAPES
-// ═══════════════════════════════════════════
-async function ajouterEtape(id) {
-  const ordreVal = document.getElementById(`et_ordre_${id}`).value;
-  const titre    = document.getElementById(`et_titre_${id}`).value.trim();
-  const question = document.getElementById(`et_question_${id}`).value.trim();
-
-  if (!ordreVal || !titre || !question) {
-    return showToast('❌ أدخل رقم الترتيب، العنوان، والسؤال', 'error');
-  }
-
-  const ordre = parseInt(ordreVal);
-
-  // Copie profonde de l'entreprise
-  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
-  if (!entreprise.etapes) entreprise.etapes = [];
-
-  // Vérifier doublon
-  if (entreprise.etapes.find(et=>et.ordre===ordre)) {
-    return showToast(`❌ الترتيب ${ordre} موجود مسبقاً !`, 'error');
-  }
-
-  // Ajouter l'étape
-  entreprise.etapes.push({ ordre, titre, question, options:[] });
-  entreprise.etapes.sort((a,b)=>a.ordre-b.ordre);
-
-  showToast('⏳ جاري الحفظ...', 'info');
-  const ok = await saveEntreprise(id, entreprise);
-  if (ok) showToast('✅ تمت إضافة الخطوة !', 'success');
+// ════════════════════════════════════
+async function addEt(id) {
+  const o = parseInt(document.getElementById(`eo_${id}`).value);
+  const q = document.getElementById(`eq_${id}`).value.trim();
+  if (!o||!q) return toast('❌ أدخل الترتيب والسؤال','err');
+  const e = copy(data.find(x=>x._id===id));
+  if (e.etapes.find(et=>et.ordre===o)) return toast(`❌ الترتيب ${o} موجود مسبقاً !`,'err');
+  e.etapes.push({ordre:o,question:q,options:[]});
+  e.etapes.sort((a,b)=>a.ordre-b.ordre);
+  toast('⏳ جاري الحفظ...','info');
+  if (await save(id,e)) toast('✅ تمت إضافة الخطوة !','ok');
 }
 
-async function supprimerEtape(id, ei) {
-  if (!confirm('حذف هذه الخطوة وجميع خياراتها ؟')) return;
-  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
-  entreprise.etapes.splice(ei, 1);
-  showToast('⏳ جاري الحفظ...', 'info');
-  const ok = await saveEntreprise(id, entreprise);
-  if (ok) showToast('🗑️ تم حذف الخطوة', 'success');
+async function delEt(id, ei) {
+  if (!confirm('حذف هذه الخطوة ؟')) return;
+  const e = copy(data.find(x=>x._id===id));
+  e.etapes.splice(ei,1);
+  toast('⏳ جاري الحذف...','info');
+  if (await save(id,e)) toast('🗑️ تم حذف الخطوة','ok');
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // CRUD OPTIONS
-// ═══════════════════════════════════════════
-async function ajouterOption(id, ei) {
-  const texte = document.getElementById(`opt_texte_${id}_${ei}`).value.trim();
-  const desc  = document.getElementById(`opt_desc_${id}_${ei}`).value.trim();
-  if (!texte) return showToast('❌ أدخل نص الخيار', 'error');
-
-  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
-  if (!entreprise.etapes[ei].options) entreprise.etapes[ei].options = [];
-  entreprise.etapes[ei].options.push({ texte, description:desc });
-
-  showToast('⏳ جاري الحفظ...', 'info');
-  const ok = await saveEntreprise(id, entreprise);
-  if (ok) showToast('✅ تمت إضافة الخيار !', 'success');
+// ════════════════════════════════════
+async function addOpt(id, ei) {
+  const t = document.getElementById(`ot_${id}_${ei}`).value.trim();
+  if (!t) return toast('❌ أدخل نص الخيار','err');
+  const e = copy(data.find(x=>x._id===id));
+  if (!e.etapes[ei].options) e.etapes[ei].options=[];
+  e.etapes[ei].options.push({texte:t});
+  toast('⏳ جاري الحفظ...','info');
+  if (await save(id,e)) toast('✅ تمت إضافة الخيار !','ok');
 }
 
-async function supprimerOption(id, ei, oi) {
+async function delOpt(id, ei, oi) {
   if (!confirm('حذف هذا الخيار ؟')) return;
-  const entreprise = JSON.parse(JSON.stringify(allEntreprises.find(e=>e._id===id)));
-  entreprise.etapes[ei].options.splice(oi, 1);
-  showToast('⏳ جاري الحفظ...', 'info');
-  const ok = await saveEntreprise(id, entreprise);
-  if (ok) showToast('🗑️ تم حذف الخيار', 'success');
+  const e = copy(data.find(x=>x._id===id));
+  e.etapes[ei].options.splice(oi,1);
+  toast('⏳ جاري الحذف...','info');
+  if (await save(id,e)) toast('🗑️ تم حذف الخيار','ok');
 }
 
-// ═══════════════════════════════════════════
-// USERS TAB
-// ═══════════════════════════════════════════
-function afficherUsers() {
-  const div = document.getElementById('liste-users');
-  if (!allEntreprises.length) {
-    div.innerHTML = '<p style="text-align:center;padding:40px;color:#aaa">لا يوجد مستخدمون.</p>';
-    return;
-  }
-  div.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead><tr style="background:#f5f5f5;text-align:right">
-        <th style="padding:10px;border-bottom:2px solid #eee">الشركة</th>
-        <th style="padding:10px;border-bottom:2px solid #eee">رقم WhatsApp</th>
-        <th style="padding:10px;border-bottom:2px solid #eee">كلمة المرور</th>
-        <th style="padding:10px;border-bottom:2px solid #eee">الحالة</th>
-        <th style="padding:10px;border-bottom:2px solid #eee">الخطوات</th>
-        <th style="padding:10px;border-bottom:2px solid #eee">الخيارات</th>
-      </tr></thead>
-      <tbody>${allEntreprises.map(e=>`
-        <tr style="border-bottom:1px solid #f0f0f0">
-          <td style="padding:10px;font-weight:600">🏢 ${e.nom}</td>
-          <td style="padding:10px">📱 ${e.numeroWhatsApp}</td>
-          <td style="padding:10px"><span style="background:#f5f5f5;padding:3px 8px;border-radius:4px;font-family:monospace">${e.motdepasse||'—'}</span></td>
-          <td style="padding:10px"><span class="${e.actif?'status-active':'status-inactive'}">${e.actif?'نشط':'متوقف'}</span></td>
-          <td style="padding:10px;text-align:center">${(e.etapes||[]).length}</td>
-          <td style="padding:10px;text-align:center">${(e.etapes||[]).reduce((s,et)=>s+(et.options||[]).length,0)}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
+// ════════════════════════════════════
+// USERS
+// ════════════════════════════════════
+function renderUsers() {
+  const d = document.getElementById('ulist');
+  if (!data.length) { d.innerHTML='<p style="text-align:center;padding:40px;color:#aaa">لا يوجد مستخدمون.</p>'; return; }
+  d.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr style="background:#f5f5f5;text-align:right">
+      <th style="padding:10px;border-bottom:2px solid #eee">الشركة</th>
+      <th style="padding:10px;border-bottom:2px solid #eee">رقم WhatsApp</th>
+      <th style="padding:10px;border-bottom:2px solid #eee">كلمة المرور</th>
+      <th style="padding:10px;border-bottom:2px solid #eee">الحالة</th>
+      <th style="padding:10px;border-bottom:2px solid #eee">الخطوات</th>
+      <th style="padding:10px;border-bottom:2px solid #eee">الخيارات</th>
+    </tr></thead>
+    <tbody>${data.map(e=>`
+      <tr style="border-bottom:1px solid #f0f0f0">
+        <td style="padding:10px;font-weight:600">🏢 ${e.nom}</td>
+        <td style="padding:10px">📱 ${e.numeroWhatsApp}</td>
+        <td style="padding:10px"><code style="background:#f5f5f5;padding:2px 8px;border-radius:4px">${e.motdepasse||'—'}</code></td>
+        <td style="padding:10px"><span class="${e.actif?'sa':'si'}">${e.actif?'نشط':'متوقف'}</span></td>
+        <td style="padding:10px;text-align:center">${(e.etapes||[]).length}</td>
+        <td style="padding:10px;text-align:center">${(e.etapes||[]).reduce((s,et)=>s+(et.options||[]).length,0)}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
 }
 
-// ═══════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════
-let toastTimer;
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (type ? ' '+type : '');
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  if (type !== 'info') {
-    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-  }
+// ════════════════════════════════════
+// UTILS
+// ════════════════════════════════════
+const copy = obj => JSON.parse(JSON.stringify(obj));
+
+let tt;
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type?' '+type:'');
+  el.classList.add('show');
+  clearTimeout(tt);
+  if (type !== 'info') tt = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-document.getElementById('login-password').addEventListener('keydown', e => {
-  if (e.key === 'Enter') login();
-});
+document.getElementById('lpwd').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
 </script>
 </body>
 </html>
