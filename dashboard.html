@@ -14,7 +14,6 @@
 }
 body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); }
 
-/* LOGIN */
 #LP { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1a1a2e,#0f3460); }
 .lbox { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
 .lbox h1 { font-size:22px; font-weight:700; color:#1a1a2e; margin:10px 0 4px; }
@@ -25,7 +24,6 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); }
 .lb:hover { background:var(--gd); }
 .lerr { background:#ffebee; color:var(--red); padding:10px; border-radius:var(--rs); margin-top:12px; font-size:13px; display:none; }
 
-/* APP */
 #AP { display:none; }
 .hdr { background:linear-gradient(135deg,var(--green),var(--gd)); color:white; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(37,211,102,0.3); }
 .htitle { font-size:18px; font-weight:700; }
@@ -36,12 +34,10 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); }
 .rchip.admin { color:#d32f2f; }
 .wrap { max-width:960px; margin:0 auto; padding:24px 16px; }
 
-/* CARDS */
 .card { background:white; border-radius:var(--r); padding:24px; margin-bottom:20px; box-shadow:var(--shadow); }
 .ctitle { font-size:16px; font-weight:700; color:#1a1a1a; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
 .cdot { width:4px; height:18px; background:var(--green); border-radius:2px; }
 
-/* FORM */
 .fg { margin-bottom:12px; }
 .fg label { display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:5px; }
 input[type=text], input[type=password], input[type=number], textarea {
@@ -51,7 +47,6 @@ input[type=text], input[type=password], input[type=number], textarea {
 input:focus, textarea:focus { outline:none; border-color:var(--purple); background:white; }
 textarea { height:70px; resize:vertical; }
 
-/* BUTTONS */
 .btn { padding:9px 18px; border:none; border-radius:var(--rs); cursor:pointer; font-size:13px; font-weight:600; font-family:inherit; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
 .btn:hover { transform:translateY(-1px); opacity:0.9; }
 .bg  { background:var(--green);  color:white; }
@@ -61,7 +56,6 @@ textarea { height:70px; resize:vertical; }
 .bp  { background:var(--purple); color:white; }
 .sm  { padding:5px 12px; font-size:12px; }
 
-/* ENTREPRISE */
 .ecard { border:1.5px solid #e8e8e8; border-radius:var(--r); margin-bottom:16px; overflow:hidden; }
 .ehdr  { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:linear-gradient(to left,#f8fffe,#f0faf5); border-bottom:1px solid #e8e8e8; flex-wrap:wrap; gap:10px; }
 .einfo h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
@@ -71,7 +65,6 @@ textarea { height:70px; resize:vertical; }
 .si { background:#ffebee; color:#c62828; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
 .ebody { padding:20px; }
 
-/* ÉTAPE */
 .etcard { border:2px solid var(--purple); border-radius:var(--r); margin-bottom:14px; overflow:hidden; }
 .ethdr  { display:flex; align-items:center; gap:12px; padding:12px 16px; background:linear-gradient(to left,#f3e5f5,#ede7f6); border-bottom:1px solid #ce93d8; }
 .etnum  { width:34px; height:34px; background:var(--purple); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
@@ -79,29 +72,32 @@ textarea { height:70px; resize:vertical; }
 .etq    { font-size:14px; font-weight:700; color:#4a148c; }
 .etbody { padding:14px 16px; background:white; }
 
-/* OPTION */
+/* MEDIA PREVIEW */
+.media-box { background:#f8f4ff; border:1.5px solid #ce93d8; border-radius:var(--rs); padding:12px; margin-bottom:12px; }
+.media-box h4 { font-size:13px; font-weight:700; color:#7b1fa2; margin-bottom:8px; }
+.media-tabs { display:flex; gap:8px; margin-bottom:10px; }
+.mtab { padding:5px 14px; border:1.5px solid #ce93d8; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; color:#7b1fa2; background:white; font-family:inherit; }
+.mtab.active { background:var(--purple); color:white; border-color:var(--purple); }
+.media-preview { margin-top:8px; }
+.media-preview img { max-width:100%; max-height:120px; border-radius:var(--rs); border:1px solid #ddd; }
+
 .ocard { display:flex; align-items:center; justify-content:space-between; background:#f3e5f5; border:1px solid #ce93d8; border-right:4px solid var(--purple); border-radius:var(--rs); padding:10px 14px; margin-bottom:8px; }
 .otxt  { font-weight:600; font-size:14px; }
 
-/* ZONES */
 .azone  { background:#fafafa; border:1.5px dashed #ccc; border-radius:var(--rs); padding:14px; margin-top:10px; }
 .aetzone { background:#f3e5f5; border:2px dashed #ce93d8; border-radius:var(--rs); padding:16px; margin-top:16px; }
 .aztitle { font-size:13px; font-weight:700; margin-bottom:10px; }
 
-/* FLOW */
 .flow { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:var(--rs); padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
 
-/* ADMIN BAR */
 .abar { background:linear-gradient(135deg,#fff3e0,#fff8e1); border:2px solid var(--orange); border-radius:var(--r); padding:16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .abar label { font-weight:700; color:#e65100; font-size:14px; white-space:nowrap; }
 .abar select { margin:0; max-width:300px; width:auto; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:var(--rs); font-size:14px; font-family:inherit; background:#fafafa; }
 
-/* TABS */
 .tabs { display:flex; border-bottom:2px solid #e0e0e0; margin-bottom:20px; }
 .tab  { padding:10px 20px; font-size:14px; font-weight:600; color:#888; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; }
 .tab.active { color:var(--green); border-bottom-color:var(--green); }
 
-/* TOAST */
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:#323232; color:white; padding:12px 24px; border-radius:24px; font-size:14px; z-index:9999; transition:transform 0.3s; pointer-events:none; }
 .toast.show { transform:translateX(-50%) translateY(0); }
 .toast.ok   { background:#2e7d32; }
@@ -112,6 +108,9 @@ textarea { height:70px; resize:vertical; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .loading { text-align:center; padding:30px; color:#aaa; }
 
+/* MEDIA TYPE BADGE */
+.media-badge { display:inline-flex; align-items:center; gap:4px; background:#ede7f6; color:#7b1fa2; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; margin-top:4px; }
+
 @media(max-width:600px) {
   .hdr,.wrap { padding-left:14px; padding-right:14px; }
   .ehdr,.abar { flex-direction:column; }
@@ -120,7 +119,6 @@ textarea { height:70px; resize:vertical; }
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="LP">
   <div class="lbox">
     <div style="font-size:48px">🤖</div>
@@ -133,7 +131,6 @@ textarea { height:70px; resize:vertical; }
   </div>
 </div>
 
-<!-- APP -->
 <div id="AP">
   <header class="hdr">
     <div style="display:flex;align-items:center;gap:12px">
@@ -157,7 +154,6 @@ textarea { height:70px; resize:vertical; }
       <div class="tab" onclick="switchTab('u')">👥 المستخدمين</div>
     </div>
 
-    <!-- TAB ENTREPRISES -->
     <div id="te">
       <div class="abar" id="abar" style="display:none">
         <label>🔧 وضع المدير :</label>
@@ -171,7 +167,7 @@ textarea { height:70px; resize:vertical; }
         <div class="fg"><label>رقم WhatsApp</label><input type="text" id="fnum" placeholder="212612838772"></div>
         <div class="fg"><label>كلمة مرور العميل</label><input type="text" id="fpwd" placeholder="boutique123"></div>
         <div class="fg"><label>رسالة الترحيب</label><textarea id="fsal" placeholder="مرحبا بك ! 👋"></textarea></div>
-        <div class="fg"><label>رسالة الخاتمة (تظهر في ملخص الطلب)</label><textarea id="frec" placeholder="شكراً ! سنتواصل معك قريباً 😊"></textarea></div>
+        <div class="fg"><label>رسالة الخاتمة</label><textarea id="frec" placeholder="شكراً ! سنتواصل معك قريباً 😊"></textarea></div>
         <button class="btn bg" onclick="addE()">✅ إضافة</button>
         <button class="btn br" onclick="hideAF()" style="margin-right:8px">❌ إلغاء</button>
       </div>
@@ -182,7 +178,6 @@ textarea { height:70px; resize:vertical; }
       </div>
     </div>
 
-    <!-- TAB USERS -->
     <div id="tu" style="display:none">
       <div class="card">
         <div class="ctitle"><div class="cdot"></div>👥 المستخدمين</div>
@@ -196,35 +191,25 @@ textarea { height:70px; resize:vertical; }
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════
-// ⚙️ CONFIG — CHANGEZ ICI
-// ════════════════════════════════════
 const API   = 'https://web-production-53c34.up.railway.app';
-const ANUM  = '212600000000'; // numéro admin
-const AKEY  = 'admin@2025!';  // clé admin (même valeur que ADMIN_KEY dans Railway)
+const ANUM  = '212600000000';
+const AKEY  = 'admin@2025!';
 
-// ════════════════════════════════════
-// STATE
-// ════════════════════════════════════
-let me   = null;   // utilisateur connecté
-let data = [];     // toutes les entreprises
-let selId = null;  // entreprise sélectionnée (admin)
+let me   = null;
+let data = [];
+let selId = null;
 
-// ════════════════════════════════════
-// AUTH
-// ════════════════════════════════════
+// ══════════ AUTH ══════════
 async function login() {
   const num = document.getElementById('lnum').value.trim();
   const pwd = document.getElementById('lpwd').value.trim();
   if (!num || !pwd) return lerr('يرجى ملء جميع الحقول');
 
-  // Admin
   if (num === ANUM && pwd === AKEY) {
     me = { num, role:'admin', nom:'👑 المدير', pwd };
     boot(); load(); return;
   }
 
-  // Client
   try {
     const r = await fetch(`${API}/api/auth/login`, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -270,9 +255,7 @@ function logout() {
   document.getElementById('lpwd').value = '';
 }
 
-// ════════════════════════════════════
-// TABS
-// ════════════════════════════════════
+// ══════════ TABS ══════════
 function switchTab(t) {
   document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', i===(t==='e'?0:1)));
   document.getElementById('te').style.display = t==='e'?'block':'none';
@@ -280,16 +263,13 @@ function switchTab(t) {
   if (t==='u') renderUsers();
 }
 
-// ════════════════════════════════════
-// LOAD (admin seulement)
-// ════════════════════════════════════
+// ══════════ LOAD ══════════
 async function load() {
   document.getElementById('elist').innerHTML = '<div class="loading"><span class="spin"></span></div>';
   try {
     const r = await fetch(`${API}/api/entreprises`, { headers:{'x-admin-key':AKEY} });
     if (!r.ok) throw new Error('Erreur ' + r.status);
     data = await r.json();
-    // Mettre à jour sélecteur
     const s = document.getElementById('asel');
     const p = s.value;
     s.innerHTML = '<option value="">— عرض الكل —</option>' +
@@ -303,9 +283,7 @@ async function load() {
 
 function aselChange() { selId = document.getElementById('asel').value; render(); }
 
-// ════════════════════════════════════
-// RENDER
-// ════════════════════════════════════
+// ══════════ RENDER ══════════
 function render() {
   const el = document.getElementById('elist');
   const list = me.role==='admin'
@@ -319,9 +297,9 @@ function render() {
 }
 
 function renderE(e) {
-  const isA  = me.role==='admin';
-  const ets  = [...(e.etapes||[])].sort((a,b)=>a.ordre-b.ordre);
-  const id   = e._id;
+  const isA = me.role==='admin';
+  const ets = [...(e.etapes||[])].sort((a,b)=>a.ordre-b.ordre);
+  const id  = e._id;
   return `
   <div class="ecard">
     <div class="ehdr">
@@ -341,28 +319,62 @@ function renderE(e) {
       </div>
     </div>
     <div class="ebody">
-
       ${ets.length?`
         <div class="flow">
           <span style="font-size:12px;color:var(--green)">▶️ بداية</span>
-          ${ets.map(et=>`<span style="color:#555">→</span><span style="background:var(--purple);color:white;padding:3px 10px;border-radius:12px;font-size:12px">${et.question.substring(0,20)}</span>`).join('')}
+          ${ets.map(et=>`
+            <span style="color:#555">→</span>
+            <span style="background:var(--purple);color:white;padding:3px 10px;border-radius:12px;font-size:12px">
+              ${et.imageUrl?'📸 ':et.audioUrl?'🎵 ':''}${et.question.substring(0,20)}
+            </span>
+          `).join('')}
           <span style="color:#555">→</span>
           <span style="background:var(--green);color:white;padding:3px 10px;border-radius:12px;font-size:12px">📋 ملخص</span>
         </div>
       `:''}
-
       <p style="font-size:13px;color:#555;font-weight:600;margin-bottom:12px">📋 الخطوات (${ets.length}) :</p>
-
-      ${ets.length===0
-        ?'<p style="color:#aaa;font-size:13px;margin-bottom:12px">لا توجد خطوات بعد.</p>'
-        :ets.map((et,ei)=>renderEt(id,et,ei)).join('')}
-
+      ${ets.length===0?'<p style="color:#aaa;font-size:13px;margin-bottom:12px">لا توجد خطوات بعد.</p>':ets.map((et,ei)=>renderEt(id,et,ei)).join('')}
       <div class="aetzone">
         <div class="aztitle" style="color:var(--purple)">➕ إضافة خطوة جديدة :</div>
         <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;margin-bottom:10px">
           <div class="fg" style="margin:0"><label>الترتيب</label><input type="number" id="eo_${id}" value="${ets.length+1}" min="1"></div>
-          <div class="fg" style="margin:0"><label>السؤال</label><input type="text" id="eq_${id}" placeholder="مثال: شمن موديل ختريتي ؟"></div>
+          <div class="fg" style="margin:0"><label>السؤال / النص</label><input type="text" id="eq_${id}" placeholder="مثال: شوف الصور واختر الموديل :"></div>
         </div>
+
+        <!-- MÉDIA SECTION -->
+        <div class="media-box">
+          <h4>📎 إضافة صورة أو صوت (اختياري)</h4>
+          <div class="media-tabs">
+            <button class="mtab active" id="mtab_img_${id}" onclick="switchMedia('${id}','img')">📸 صورة</button>
+            <button class="mtab" id="mtab_aud_${id}" onclick="switchMedia('${id}','aud')">🎵 صوت</button>
+            <button class="mtab" id="mtab_none_${id}" onclick="switchMedia('${id}','none')">❌ بدون</button>
+          </div>
+
+          <div id="mimg_${id}">
+            <div class="fg" style="margin:0">
+              <label>رابط الصورة (JPG/PNG)</label>
+              <input type="text" id="eimg_${id}" placeholder="https://exemple.com/photo.jpg" oninput="previewImg('${id}')">
+            </div>
+            <div class="media-preview" id="prev_${id}"></div>
+          </div>
+
+          <div id="maud_${id}" style="display:none">
+            <div class="fg" style="margin:0">
+              <label>رابط الصوت (MP3/OGG)</label>
+              <input type="text" id="eaud_${id}" placeholder="https://exemple.com/audio.mp3">
+            </div>
+          </div>
+
+          <div id="mnone_${id}" style="display:none">
+            <p style="color:#888;font-size:13px;padding:8px">لا يوجد صورة أو صوت في هذه الخطوة.</p>
+          </div>
+
+          <div class="fg" style="margin-top:10px;margin-bottom:0">
+            <label>نص مرافق (يظهر مع الصورة/الصوت)</label>
+            <input type="text" id="etxt_${id}" placeholder="مثال: 📸 هادي هي الموديلات المتاحة :">
+          </div>
+        </div>
+
         <button class="btn bp" onclick="addEt('${id}')">➕ إضافة الخطوة</button>
       </div>
     </div>
@@ -371,25 +383,48 @@ function renderE(e) {
 
 function renderEt(eid, et, ei) {
   const opts = et.options||[];
+  const hasImg = et.imageUrl && et.imageUrl.trim();
+  const hasAud = et.audioUrl && et.audioUrl.trim();
   return `
   <div class="etcard">
     <div class="ethdr">
       <div class="etnum">${et.ordre}</div>
       <div class="etinfo">
         <div class="etq">❓ ${et.question}</div>
-        <div style="font-size:11px;color:#888;margin-top:2px">${opts.length} خيار</div>
+        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+          ${hasImg?`<span class="media-badge">📸 صورة</span>`:''}
+          ${hasAud?`<span class="media-badge">🎵 صوت</span>`:''}
+          ${et.texteMedia?`<span class="media-badge">💬 ${et.texteMedia.substring(0,20)}</span>`:''}
+          <span class="media-badge">${opts.length} خيار</span>
+        </div>
       </div>
       <button class="btn br sm" onclick="delEt('${eid}',${ei})">🗑️</button>
     </div>
     <div class="etbody">
+
+      ${hasImg?`
+        <div style="margin-bottom:12px">
+          <p style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">📸 الصورة :</p>
+          <img src="${et.imageUrl}" style="max-width:100%;max-height:150px;border-radius:var(--rs);border:1px solid #ddd" onerror="this.style.display='none'">
+          <p style="font-size:11px;color:#888;margin-top:4px">${et.imageUrl}</p>
+        </div>
+      `:''}
+
+      ${hasAud?`
+        <div style="margin-bottom:12px;background:#f3e5f5;padding:10px;border-radius:var(--rs)">
+          <p style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">🎵 الصوت :</p>
+          <audio controls style="width:100%;height:36px"><source src="${et.audioUrl}"></audio>
+        </div>
+      `:''}
+
       <p style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">🎯 الخيارات :</p>
-      ${opts.length===0
-        ?'<p style="color:#aaa;font-size:12px;margin-bottom:8px">لا توجد خيارات بعد.</p>'
-        :opts.map((o,oi)=>`
+      ${opts.length===0?'<p style="color:#aaa;font-size:12px;margin-bottom:8px">لا توجد خيارات بعد.</p>':
+        opts.map((o,oi)=>`
           <div class="ocard">
             <div class="otxt">▪️ ${o.texte}</div>
             <button class="btn br sm" onclick="delOpt('${eid}',${ei},${oi})">🗑️</button>
           </div>`).join('')}
+
       <div class="azone">
         <div class="aztitle">➕ إضافة خيار :</div>
         <div style="display:flex;gap:10px;align-items:flex-end">
@@ -401,9 +436,25 @@ function renderEt(eid, et, ei) {
   </div>`;
 }
 
-// ════════════════════════════════════
-// CRUD ENTREPRISE
-// ════════════════════════════════════
+// ══════════ MEDIA HELPERS ══════════
+function switchMedia(id, type) {
+  ['img','aud','none'].forEach(t => {
+    document.getElementById(`m${t}_${id}`).style.display = t===type?'block':'none';
+    document.getElementById(`mtab_${t}_${id}`).classList.toggle('active', t===type);
+  });
+}
+
+function previewImg(id) {
+  const url = document.getElementById(`eimg_${id}`).value.trim();
+  const prev = document.getElementById(`prev_${id}`);
+  if (url) {
+    prev.innerHTML = `<img src="${url}" style="max-width:100%;max-height:120px;border-radius:var(--rs);border:1px solid #ddd;margin-top:8px" onerror="this.style.display='none'">`;
+  } else {
+    prev.innerHTML = '';
+  }
+}
+
+// ══════════ CRUD ENTREPRISE ══════════
 function showAF() { document.getElementById('AF').style.display='block'; document.getElementById('AF').scrollIntoView({behavior:'smooth'}); }
 function hideAF() { document.getElementById('AF').style.display='none'; }
 
@@ -438,9 +489,7 @@ async function toggleA(id, actif) {
   toast(actif?'⏸ تم الإيقاف':'▶️ تم التشغيل','ok');
 }
 
-// ════════════════════════════════════
-// SAVE HELPER
-// ════════════════════════════════════
+// ══════════ SAVE ══════════
 async function save(id, body) {
   const h = me.role==='admin'
     ? {'Content-Type':'application/json','x-admin-key':AKEY}
@@ -448,7 +497,6 @@ async function save(id, body) {
   const r = await fetch(`${API}/api/entreprises/${id}`,{method:'PUT',headers:h,body:JSON.stringify(body)});
   const d = await r.json();
   if (!r.ok) { toast('❌ خطأ: '+(d.error||r.status),'err'); return false; }
-  // Recharger
   if (me.role==='admin') await load();
   else {
     const r2 = await fetch(`${API}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({numeroWhatsApp:me.num,motdepasse:me.pwd})});
@@ -458,17 +506,31 @@ async function save(id, body) {
   return true;
 }
 
-// ════════════════════════════════════
-// CRUD ÉTAPES
-// ════════════════════════════════════
+// ══════════ CRUD ÉTAPES ══════════
 async function addEt(id) {
-  const o = parseInt(document.getElementById(`eo_${id}`).value);
-  const q = document.getElementById(`eq_${id}`).value.trim();
-  if (!o||!q) return toast('❌ أدخل الترتيب والسؤال','err');
+  const o   = parseInt(document.getElementById(`eo_${id}`).value);
+  const q   = document.getElementById(`eq_${id}`).value.trim();
+  const txt = document.getElementById(`etxt_${id}`).value.trim();
+
+  // Détecter le type de média actif
+  const imgTab  = document.getElementById(`mtab_img_${id}`);
+  const audTab  = document.getElementById(`mtab_aud_${id}`);
+  const imgUrl  = document.getElementById(`eimg_${id}`)?.value.trim() || '';
+  const audUrl  = document.getElementById(`eaud_${id}`)?.value.trim() || '';
+
+  let imageUrl = '';
+  let audioUrl = '';
+  if (imgTab.classList.contains('active')) imageUrl = imgUrl;
+  else if (audTab.classList.contains('active')) audioUrl = audUrl;
+
+  if (!o || !q) return toast('❌ أدخل الترتيب والسؤال','err');
+
   const e = copy(data.find(x=>x._id===id));
   if (e.etapes.find(et=>et.ordre===o)) return toast(`❌ الترتيب ${o} موجود مسبقاً !`,'err');
-  e.etapes.push({ordre:o,question:q,options:[]});
+
+  e.etapes.push({ ordre:o, question:q, imageUrl, audioUrl, texteMedia:txt, options:[] });
   e.etapes.sort((a,b)=>a.ordre-b.ordre);
+
   toast('⏳ جاري الحفظ...','info');
   if (await save(id,e)) toast('✅ تمت إضافة الخطوة !','ok');
 }
@@ -481,9 +543,7 @@ async function delEt(id, ei) {
   if (await save(id,e)) toast('🗑️ تم حذف الخطوة','ok');
 }
 
-// ════════════════════════════════════
-// CRUD OPTIONS
-// ════════════════════════════════════
+// ══════════ CRUD OPTIONS ══════════
 async function addOpt(id, ei) {
   const t = document.getElementById(`ot_${id}_${ei}`).value.trim();
   if (!t) return toast('❌ أدخل نص الخيار','err');
@@ -502,9 +562,7 @@ async function delOpt(id, ei, oi) {
   if (await save(id,e)) toast('🗑️ تم حذف الخيار','ok');
 }
 
-// ════════════════════════════════════
-// USERS
-// ════════════════════════════════════
+// ══════════ USERS ══════════
 function renderUsers() {
   const d = document.getElementById('ulist');
   if (!data.length) { d.innerHTML='<p style="text-align:center;padding:40px;color:#aaa">لا يوجد مستخدمون.</p>'; return; }
@@ -515,7 +573,6 @@ function renderUsers() {
       <th style="padding:10px;border-bottom:2px solid #eee">كلمة المرور</th>
       <th style="padding:10px;border-bottom:2px solid #eee">الحالة</th>
       <th style="padding:10px;border-bottom:2px solid #eee">الخطوات</th>
-      <th style="padding:10px;border-bottom:2px solid #eee">الخيارات</th>
     </tr></thead>
     <tbody>${data.map(e=>`
       <tr style="border-bottom:1px solid #f0f0f0">
@@ -524,15 +581,12 @@ function renderUsers() {
         <td style="padding:10px"><code style="background:#f5f5f5;padding:2px 8px;border-radius:4px">${e.motdepasse||'—'}</code></td>
         <td style="padding:10px"><span class="${e.actif?'sa':'si'}">${e.actif?'نشط':'متوقف'}</span></td>
         <td style="padding:10px;text-align:center">${(e.etapes||[]).length}</td>
-        <td style="padding:10px;text-align:center">${(e.etapes||[]).reduce((s,et)=>s+(et.options||[]).length,0)}</td>
       </tr>`).join('')}
     </tbody>
   </table>`;
 }
 
-// ════════════════════════════════════
-// UTILS
-// ════════════════════════════════════
+// ══════════ UTILS ══════════
 const copy = obj => JSON.parse(JSON.stringify(obj));
 
 let tt;

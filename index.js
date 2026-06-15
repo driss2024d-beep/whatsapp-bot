@@ -13,9 +13,12 @@ const sessions = new Map();
 // ✅ Schémas
 const optionSchema = new mongoose.Schema({ texte: String });
 const etapeSchema  = new mongoose.Schema({
-  ordre:    Number,
-  question: String,
-  options:  [optionSchema]
+  ordre:     Number,
+  question:  String,
+  imageUrl:  String,  // ← NOUVEAU: lien photo
+  audioUrl:  String,  // ← NOUVEAU: lien audio
+  texteMedia:String,  // ← NOUVEAU: texte accompagnant le média
+  options:   [optionSchema]
 });
 const entrepriseSchema = new mongoose.Schema({
   nom:           String,
@@ -43,8 +46,22 @@ mongoose.connect(process.env.MONGODB_URI, {
       messageRecap: 'شكراً ! سنتواصل معك قريباً 😊',
       actif: true,
       etapes: [
-        { ordre: 1, question: 'شمن موديل ختريتي ؟', options: [{ texte: 'الموديل 1' }, { texte: 'الموديل 2' }, { texte: 'الموديل 3' }] },
-        { ordre: 2, question: 'شمن نمرة ؟',          options: [{ texte: '40' }, { texte: '41' }, { texte: '43' }] }
+        {
+          ordre: 1,
+          question: 'شوف الصور وختار الموديل ديالك :',
+          imageUrl: '',
+          audioUrl: '',
+          texteMedia: '📸 هادي هي الموديلات المتاحة :',
+          options: [{ texte: 'الموديل 1' }, { texte: 'الموديل 2' }, { texte: 'الموديل 3' }]
+        },
+        {
+          ordre: 2,
+          question: 'شمن نمرة ؟',
+          imageUrl: '',
+          audioUrl: '',
+          texteMedia: '',
+          options: [{ texte: '40' }, { texte: '41' }, { texte: '43' }]
+        }
       ]
     });
     console.log('✅ Données test créées !');
@@ -53,9 +70,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // ✅ Webhook verify
 app.get('/webhook', (req, res) => {
-  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
+  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.VERIFY_TOKEN)
     res.send(req.query['hub.challenge']);
-  } else res.sendStatus(403);
+  else res.sendStatus(403);
 });
 
 // ✅ Recevoir messages
@@ -74,7 +91,7 @@ app.post('/webhook', async (req, res) => {
 
     if (msg.type === 'text') {
       texte = msg.text?.body?.trim();
-      if (session.etat === 'attente') return; // ignorer texte auto
+      if (session.etat === 'attente') return;
     } else if (msg.type === 'interactive') {
       if (msg.interactive?.button_reply) {
         texte = msg.interactive.button_reply.id;
@@ -88,14 +105,14 @@ app.post('/webhook', async (req, res) => {
     if (!entreprise) return;
 
     const etapes = [...entreprise.etapes].sort((a, b) => a.ordre - b.ordre);
-    const motsStart = ['salam', 'hi', 'hello', 'مرحبا', 'سلام', 'bonjour', 'start', 'بداية', '0', 'menu'];
+    const motsStart = ['salam','hi','hello','مرحبا','سلام','bonjour','start','بداية','0','menu'];
 
     // ── START
     if (session.etat === 'debut' || motsStart.includes(texte.toLowerCase())) {
       session = { etat: 'attente', etape: 0, reponses: [] };
       await envoyerMessage(from, entreprise.salutation);
       await sleep(400);
-      await envoyerBoutons(from, etapes[0]);
+      await envoyerEtape(from, etapes[0]);
       sessions.set(from, session);
 
     // ── CHOIX
@@ -109,7 +126,7 @@ app.post('/webhook', async (req, res) => {
       } else {
         session.etape++;
         await sleep(300);
-        await envoyerBoutons(from, etapes[session.etape]);
+        await envoyerEtape(from, etapes[session.etape]);
       }
       sessions.set(from, session);
 
@@ -118,16 +135,85 @@ app.post('/webhook', async (req, res) => {
       session = { etat: 'attente', etape: 0, reponses: [] };
       await envoyerMessage(from, entreprise.salutation);
       await sleep(400);
-      await envoyerBoutons(from, etapes[0]);
+      await envoyerEtape(from, etapes[0]);
       sessions.set(from, session);
     }
 
   } catch (err) { console.error('❌', err.message); }
 });
 
+// ✅ Envoyer une étape (avec photo/audio si disponible)
+async function envoyerEtape(to, etape) {
+  try {
+    // 1. Envoyer PHOTO si existe
+    if (etape.imageUrl && etape.imageUrl.trim()) {
+      await envoyerImage(to, etape.imageUrl, etape.texteMedia || '');
+      await sleep(600);
+    }
+    // 2. Envoyer AUDIO si existe
+    else if (etape.audioUrl && etape.audioUrl.trim()) {
+      if (etape.texteMedia) {
+        await envoyerMessage(to, etape.texteMedia);
+        await sleep(400);
+      }
+      await envoyerAudio(to, etape.audioUrl);
+      await sleep(600);
+    }
+    // 3. Envoyer texte media seul (sans photo/audio)
+    else if (etape.texteMedia && etape.texteMedia.trim()) {
+      await envoyerMessage(to, etape.texteMedia);
+      await sleep(400);
+    }
+
+    // 4. Envoyer la liste des boutons
+    await envoyerBoutons(to, etape);
+
+  } catch (err) {
+    console.error('❌ Erreur étape:', err.message);
+  }
+}
+
+// ✅ Envoyer image WhatsApp
+async function envoyerImage(to, imageUrl, caption) {
+  await axios.post(
+    `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
+    {
+      messaging_product: 'whatsapp',
+      to,
+      type: 'image',
+      image: {
+        link: imageUrl,
+        caption: caption || ''
+      }
+    },
+    { headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}`, 'Content-Type': 'application/json' } }
+  );
+  console.log(`✅ Image envoyée à ${to}`);
+}
+
+// ✅ Envoyer audio WhatsApp
+async function envoyerAudio(to, audioUrl) {
+  await axios.post(
+    `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
+    {
+      messaging_product: 'whatsapp',
+      to,
+      type: 'audio',
+      audio: { link: audioUrl }
+    },
+    { headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}`, 'Content-Type': 'application/json' } }
+  );
+  console.log(`✅ Audio envoyé à ${to}`);
+}
+
 // ✅ Envoyer boutons (max 3 par message)
 async function envoyerBoutons(to, etape) {
   const opts = etape.options || [];
+  if (opts.length === 0) {
+    await envoyerMessage(to, `⚠️ لا توجد خيارات`);
+    return;
+  }
+
   const groupes = [];
   for (let i = 0; i < opts.length; i += 3) groupes.push(opts.slice(i, i + 3));
 
@@ -158,7 +244,6 @@ async function envoyerRecap(to, entreprise, reponses) {
   let recap = `✅ *تم تسجيل طلبك !*\n\n📋 *ملخص :*\n━━━━━━━━━━━━━\n`;
   reponses.forEach(r => { recap += `\n▪️ *${r.question}*\n   ✔️ ${r.reponse}\n`; });
   recap += `\n━━━━━━━━━━━━━\n💬 ${entreprise.messageRecap}`;
-
   try {
     await axios.post(
       `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
@@ -186,9 +271,9 @@ async function envoyerMessage(to, texte) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 // API
-// ═══════════════════════════════════════════
+// ════════════════════════════════════
 const isAdmin = (req, res, next) => {
   if (req.headers['x-admin-key'] !== process.env.ADMIN_KEY) return res.status(403).json({ error: 'غير مصرح' });
   next();
@@ -219,21 +304,13 @@ app.put('/api/entreprises/:id', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     const clientN  = req.headers['x-client-numero'];
     const clientP  = req.headers['x-client-password'];
-
     let e = null;
-    if (adminKey === process.env.ADMIN_KEY) {
-      e = await Entreprise.findById(req.params.id);
-    } else if (clientN && clientP) {
-      e = await Entreprise.findOne({ _id: req.params.id, numeroWhatsApp: clientN, motdepasse: clientP });
-    }
+    if (adminKey === process.env.ADMIN_KEY) e = await Entreprise.findById(req.params.id);
+    else if (clientN && clientP) e = await Entreprise.findOne({ _id: req.params.id, numeroWhatsApp: clientN, motdepasse: clientP });
     if (!e) return res.status(403).json({ error: 'غير مصرح' });
-
     const fields = ['nom','numeroWhatsApp','motdepasse','salutation','messageRecap','actif'];
     fields.forEach(f => { if (req.body[f] !== undefined) e[f] = req.body[f]; });
-    if (req.body.etapes !== undefined) {
-      e.etapes = req.body.etapes;
-      e.markModified('etapes');
-    }
+    if (req.body.etapes !== undefined) { e.etapes = req.body.etapes; e.markModified('etapes'); }
     await e.save();
     res.json({ data: e });
   } catch (err) { res.status(500).json({ error: err.message }); }
